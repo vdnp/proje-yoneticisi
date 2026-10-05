@@ -7,7 +7,7 @@
 **A keyboard-first desktop hub for your local projects.**
 Find any project in a keystroke, open it in your editor, and see its git status and tasks at a glance.
 
-[Download](../../releases/latest) · [Türkçe](README.tr.md)
+[Download](../../releases/latest) · [Türkçe](README.tr.md) · [Code signing policy](CODE_SIGNING.md)
 
 <img src="docs/screenshots/home.png" alt="Project Manager home screen" />
 
@@ -38,7 +38,9 @@ Find any project in a keystroke, open it in your editor, and see its git status 
 
 Download the latest `proje-yoneticisi-setup-<version>.exe` from [Releases](../../releases/latest) and run it. Windows 10 and 11 are supported.
 
-The installer is not code-signed yet, so Windows SmartScreen will warn about an unknown publisher. Choose **More info → Run anyway**.
+Free code signing provided by SignPath.io, certificate by SignPath Foundation. See the [code signing policy](CODE_SIGNING.md).
+
+Signing is still being set up, so current installers are unsigned and Windows SmartScreen will warn about an unknown publisher. Choose **More info → Run anyway**.
 
 To update, install the new version over the old one. Your projects are kept: the app stores its data outside the install folder (see [Your data](#your-data)).
 
