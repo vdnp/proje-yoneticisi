@@ -1,10 +1,11 @@
 import { resolve } from 'path'
-import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 
+// The app has no runtime `dependencies` (everything is bundled), so there is
+// nothing to externalize for main/preload.
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
         input: {
@@ -14,7 +15,6 @@ export default defineConfig({
     }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
         input: {

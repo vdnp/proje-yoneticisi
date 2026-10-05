@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+### Changed
+- Upgraded to Electron 44 (from 33, which no longer receives security fixes), electron-vite 5, electron-builder 26 and Vite 7.
+- The folder picker opens in your home folder when no default projects folder is set (Electron now defaults to Downloads).
+
 ## 1.1.0
 
 First public release.

@@ -366,7 +366,9 @@ function registerIpc() {
   ipcMain.handle('dialog:selectFolder', async (_e, defaultPath) => {
     const result = await dialog.showOpenDialog(mainWindow, {
       title: t('pickFolder'),
-      defaultPath: defaultPath || undefined,
+      // Without a path Electron 43+ opens Downloads, which is rarely where
+      // projects live; the home folder is a better start.
+      defaultPath: defaultPath || app.getPath('home'),
       properties: ['openDirectory']
     })
     if (result.canceled || !result.filePaths.length) return { ok: false }
