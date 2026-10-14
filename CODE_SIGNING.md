@@ -1,23 +1,10 @@
-# Code signing policy
+# Code signing and privacy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+## Code signing
 
-> **Status:** code signing is being set up. Until it is in place, the installers on the Releases page are unsigned and Windows SmartScreen will show an "unknown publisher" warning.
+The Windows installer on the [Releases](https://github.com/vdnp/proje-yoneticisi/releases) page (`proje-yoneticisi-setup-<version>.exe`) is **not code-signed**, so Windows SmartScreen shows an "unknown publisher" warning when you run it. Choose **More info → Run anyway** to continue.
 
-## What gets signed
-
-Only the Windows installer (`proje-yoneticisi-setup-<version>.exe`) published on the [Releases](https://github.com/vdnp/proje-yoneticisi/releases) page.
-
-Every installer is built by GitHub Actions from the source code in this repository, using the workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml). Nothing built outside that pipeline, and no third-party binary, is signed.
-
-## Team roles
-
-| Role | Members |
-| --- | --- |
-| Committers and reviewers | [vdnp](https://github.com/vdnp) |
-| Approvers | [vdnp](https://github.com/vdnp) |
-
-Every signing request is approved manually by an approver.
+Every installer is built by GitHub Actions from the source code in this repository, using the workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml), and each release links to the commit it was built from. Nothing is built or uploaded by hand.
 
 ## Privacy policy
 

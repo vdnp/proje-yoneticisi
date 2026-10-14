@@ -7,7 +7,7 @@
 **Yerel projelerin için klavye odaklı bir masaüstü merkezi.**
 Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevlerini bir bakışta gör.
 
-[İndir](../../releases/latest) · [English](README.md) · [Kod imzalama politikası](CODE_SIGNING.md)
+[İndir](../../releases/latest) · [English](README.md) · [Kod imzalama ve gizlilik](CODE_SIGNING.md)
 
 <img src="docs/screenshots/home-tr.png" alt="Proje Yöneticisi ana ekranı" />
 
@@ -38,9 +38,7 @@ Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevler
 
 [Releases](../../releases/latest) sayfasından en güncel `proje-yoneticisi-setup-<sürüm>.exe` dosyasını indirip çalıştır. Windows 10 ve 11 desteklenir.
 
-Free code signing provided by SignPath.io, certificate by SignPath Foundation. Ayrıntılar için [kod imzalama politikası](CODE_SIGNING.md).
-
-İmzalama henüz kuruluyor; şu anki kurulum dosyaları imzasız olduğu için Windows SmartScreen bilinmeyen yayımcı uyarısı verir. **Daha fazla bilgi → Yine de çalıştır**'ı seç.
+Kurulum dosyası kod imzalı değil, bu yüzden Windows SmartScreen bilinmeyen yayımcı uyarısı verir. **Daha fazla bilgi → Yine de çalıştır**'ı seç. Her kurulum dosyası bu deponun kaynak kodundan GitHub Actions ile derlenir; ayrıntılar için [kod imzalama ve gizlilik](CODE_SIGNING.md).
 
 Güncellemek için yeni sürümü eskisinin üzerine kur. Projelerin korunur, çünkü uygulama verilerini kurulum klasörünün dışında tutar (bkz. [Verilerin](#verilerin)).
 
