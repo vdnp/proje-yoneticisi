@@ -39,3 +39,13 @@ jobs:
         with:
           files: release/*.exe
           generate_release_notes: true
+
+      # Microsoft Store package. Not attached to the release: it's unsigned and
+      # only installable after the Store signs it. Download it from the run's
+      # artifacts and upload it in Partner Center.
+      - run: npx electron-builder --win appx --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-package-${{ github.ref_name }}
+          path: release/*.appx
+          if-no-files-found: error

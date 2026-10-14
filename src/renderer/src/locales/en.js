@@ -254,6 +254,8 @@ export default {
     trayDesc: 'Closing the window keeps the app running; reopen it from the tray icon.',
     autoLaunch: 'Start with Windows',
     autoLaunchDesc: 'Launches the app automatically when you sign in.',
+    autoLaunchStoreDesc: 'In the Microsoft Store version this is managed by Windows: Settings → Apps → Startup.',
+    openStartupSettings: 'Open startup settings',
     shortcut: 'Global shortcut',
     shortcutDesc: 'Opens the command palette even when the app is in the background. Example: CommandOrControl+Shift+P',
     shortcutSaved: 'Shortcut saved.',

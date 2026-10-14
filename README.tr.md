@@ -75,6 +75,7 @@ npm install
 npm run dev         # anlık yenilemeli Electron uygulaması
 npm run dev:web     # arayüzü tarayıcıda, uydurma örnek verilerle çalıştırır
 npm run build       # release/ klasörüne kurulum dosyası
+npm run build:store # release/ klasörüne Microsoft Store (MSIX) paketi
 ```
 
 | Yol | İçinde ne var |

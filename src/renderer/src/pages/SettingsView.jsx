@@ -86,6 +86,7 @@ export default function SettingsView({ onOpenProject }) {
 
   const [dataPath, setDataPath] = useState('')
   const [version, setVersion] = useState('')
+  const [isStore, setIsStore] = useState(false)
   const [shortcut, setShortcut] = useState(settings.globalShortcut || '')
   const [newEditor, setNewEditor] = useState({ label: '', command: '' })
   const [shortcutMsg, setShortcutMsg] = useState('')
@@ -96,7 +97,10 @@ export default function SettingsView({ onOpenProject }) {
 
   useEffect(() => {
     api.getDataPath().then(setDataPath)
-    api.getAppVersion?.().then(setVersion)
+    api.getAppInfo().then((info) => {
+      setVersion(info.version)
+      setIsStore(info.store)
+    })
     checkMissing()
   }, [checkMissing])
 
@@ -369,9 +373,17 @@ export default function SettingsView({ onOpenProject }) {
                 label={t('settings.tray')}
               />
             </Row>
-            <Row title={t('settings.autoLaunch')} desc={t('settings.autoLaunchDesc')}>
-              <Toggle checked={!!settings.autoLaunch} onChange={toggleAutoLaunch} label={t('settings.autoLaunch')} />
-            </Row>
+            {isStore ? (
+              <Row title={t('settings.autoLaunch')} desc={t('settings.autoLaunchStoreDesc')}>
+                <button onClick={() => api.openStartupSettings()} className={secondaryBtn}>
+                  {t('settings.openStartupSettings')}
+                </button>
+              </Row>
+            ) : (
+              <Row title={t('settings.autoLaunch')} desc={t('settings.autoLaunchDesc')}>
+                <Toggle checked={!!settings.autoLaunch} onChange={toggleAutoLaunch} label={t('settings.autoLaunch')} />
+              </Row>
+            )}
 
             <div className="mt-4 border-t border-surface-border pt-4">
               <label className="mb-1 block text-sm font-medium text-content-primary">

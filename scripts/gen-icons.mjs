@@ -1,6 +1,7 @@
 // Renders build/logo.svg into the raster assets electron-builder + the app need:
 //   build/icon.ico   → installer, exe, dev window icon (multi-size)
 //   build/icon.png   → 256px master (Linux / fallback)
+//   build/appx/*.png → Microsoft Store (MSIX) tiles and logos
 //   src/main/trayIcon.js → 32px + 16px tray icons inlined as base64 data URLs
 //                          (build/ is not packaged, so the tray icon must live in code)
 import { readFileSync, writeFileSync, mkdirSync } from 'fs'
@@ -14,8 +15,31 @@ const svg = readFileSync(join(root, 'build', 'logo.svg'))
 
 const png = (size) => sharp(svg, { density: 384 }).resize(size, size).png().toBuffer()
 
+// The logo at `logo` px, centered on a transparent `width`×`height` canvas.
+// Tiles use the user's accent color behind it (manifest background is
+// transparent), so the padding is what keeps the logo from touching the edges.
+async function tile(width, height, logo) {
+  return sharp({
+    create: { width, height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } }
+  })
+    .composite([{ input: await png(logo), gravity: 'center' }])
+    .png()
+    .toBuffer()
+}
+
+// File names electron-builder looks for in build/appx (base scale only, so no
+// resources.pri step is needed).
+const APPX_ASSETS = {
+  'StoreLogo.png': () => png(50),
+  'Square44x44Logo.png': () => png(44),
+  'SmallTile.png': () => tile(71, 71, 48),
+  'Square150x150Logo.png': () => tile(150, 150, 100),
+  'Wide310x150Logo.png': () => tile(310, 150, 100),
+  'LargeTile.png': () => tile(310, 310, 200)
+}
+
 async function main() {
-  mkdirSync(join(root, 'build'), { recursive: true })
+  mkdirSync(join(root, 'build', 'appx'), { recursive: true })
 
   const icoSizes = [16, 24, 32, 48, 64, 128, 256]
   const icoBuffers = await Promise.all(icoSizes.map(png))
@@ -23,6 +47,10 @@ async function main() {
 
   const master = await png(256)
   writeFileSync(join(root, 'build', 'icon.png'), master)
+
+  for (const [name, render] of Object.entries(APPX_ASSETS)) {
+    writeFileSync(join(root, 'build', 'appx', name), await render())
+  }
 
   const tray32 = (await png(32)).toString('base64')
   const tray16 = (await png(16)).toString('base64')
@@ -33,7 +61,7 @@ async function main() {
       `export const trayIcon16 = 'data:image/png;base64,${tray16}'\n`
   )
 
-  console.log('icons generated: build/icon.ico, build/icon.png, src/main/trayIcon.js')
+  console.log('icons generated: build/icon.ico, build/icon.png, build/appx/*, src/main/trayIcon.js')
 }
 
 main().catch((err) => {

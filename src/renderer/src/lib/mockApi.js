@@ -268,6 +268,15 @@ const mockApi = {
   },
   getDataPath: async () => L('(tarayıcı önizlemesi — localStorage)', '(browser preview — localStorage)'),
   getAppVersion: async () => 'web-preview',
+  // `?store=1` previews the Microsoft Store build's settings.
+  getAppInfo: async () => ({
+    version: 'web-preview',
+    store: new URLSearchParams(window.location.search).get('store') === '1'
+  }),
+  openStartupSettings: async () => {
+    preview(L('Windows başlangıç ayarları', 'Windows startup settings'))
+    return { ok: true }
+  },
 
   // Export downloads the JSON; import uses a file picker. Both stay in the browser.
   exportData: async (data) => {

@@ -1,9 +1,9 @@
 {
   "name": "project-manager",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A keyboard-first desktop hub for your local projects: open them in your editor, see git status, track tasks.",
   "license": "MIT",
-  "author": "Yiğit Enes Kaya",
+  "author": "vdnp",
   "homepage": "https://github.com/vdnp/proje-yoneticisi",
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "gen:icons": "node scripts/gen-icons.mjs",
     "screenshots": "electron scripts/screenshots.cjs",
     "build": "electron-vite build && electron-builder --win",
+    "build:store": "electron-vite build && electron-builder --win appx",
     "build:dir": "electron-vite build && electron-builder --win --dir",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -74,6 +75,23 @@
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "deleteAppDataOnUninstall": false
+    },
+    "copyright": "Copyright © 2026 Yiğit Enes Kaya",
+    "appx": {
+      "identityName": "vdnp.ProjeYneticisi",
+      "publisher": "CN=23C21DE5-D3A6-4292-BB94-FBD4955DA0B8",
+      "publisherDisplayName": "vdnp",
+      "applicationId": "ProjeYoneticisi",
+      "displayName": "Proje Yöneticisi",
+      "backgroundColor": "transparent",
+      "languages": [
+        "en-US",
+        "tr-TR"
+      ],
+      "customExtensionsPath": "build/appx-extensions.xml",
+      "artifactName": "proje-yoneticisi-store-${version}.${ext}",
+      "minVersion": "10.0.17763.0",
+      "maxVersionTested": "10.0.26100.0"
     }
   }
 }

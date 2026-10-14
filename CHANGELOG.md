@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0
+
+### Added
+- Microsoft Store (MSIX) package. The release workflow builds it as a downloadable artifact for Store submission.
+
+### Changed
+- The publisher is now shown as **vdnp** (Windows' installed apps list, Microsoft Store). Copyright stays with Yiğit Enes Kaya.
+- In the Microsoft Store version, starting with Windows is managed from Windows Settings; the app links to it.
+
 ## 1.2.0
 
 ### Changed

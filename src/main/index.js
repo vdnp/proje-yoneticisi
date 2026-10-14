@@ -24,6 +24,12 @@ let minimizeToTray = true // kept in sync with settings; controls close behavior
 
 const ICON_PATH = join(__dirname, '../../build/icon.ico')
 
+// Running from the Microsoft Store (MSIX) package. There the registry-based
+// login item has no effect (the package's registry is virtualized); starting
+// with Windows goes through the package's startup task, which the user turns
+// on in Windows Settings.
+const IS_STORE = !!process.windowsStore
+
 // Only ever hand http(s) links to the OS. A project's gitUrl or a link inside
 // a README could be any scheme (file:, ms-settings:, a custom protocol...).
 function isSafeExternal(url) {
@@ -328,6 +334,12 @@ function registerIpc() {
   })
   ipcMain.handle('data:path', () => getDataFilePath())
   ipcMain.handle('app:version', () => app.getVersion())
+  ipcMain.handle('app:info', () => ({ version: app.getVersion(), store: IS_STORE }))
+  // A fixed ms-settings URI, so it bypasses the http(s)-only rule on purpose.
+  ipcMain.handle('open:startupSettings', async () => {
+    await shell.openExternal('ms-settings:startupapps')
+    return { ok: true }
+  })
 
   ipcMain.handle('data:export', async (_e, data) => {
     const date = new Date().toISOString().slice(0, 10)
@@ -402,6 +414,7 @@ function registerIpc() {
   })
 
   ipcMain.handle('settings:autoLaunch', (_e, enabled) => {
+    if (IS_STORE) return { ok: false, error: 'store_startup' }
     try {
       app.setLoginItemSettings({ openAtLogin: !!enabled })
       return { ok: true }
@@ -477,7 +490,7 @@ if (!gotLock) {
     try {
       minimizeToTray = settings.minimizeToTray !== false
       if (settings.globalShortcut) registerGlobalShortcut(settings.globalShortcut)
-      app.setLoginItemSettings({ openAtLogin: !!settings.autoLaunch })
+      if (!IS_STORE) app.setLoginItemSettings({ openAtLogin: !!settings.autoLaunch })
     } catch {
       /* ignore */
     }

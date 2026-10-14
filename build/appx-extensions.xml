@@ -1,0 +1,7 @@
+
+        <!-- Lets the Store (MSIX) build start with Windows. Off by default: the user
+             turns it on in Settings > Apps > Startup. electron-builder's own
+             addAutoLaunchExtension would enable it for everyone on install. -->
+        <desktop:Extension Category="windows.startupTask" Executable="app\Proje Yöneticisi.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="ProjeYoneticisiStartup" Enabled="false" DisplayName="Proje Yöneticisi" />
+        </desktop:Extension>

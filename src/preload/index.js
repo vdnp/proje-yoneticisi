@@ -8,6 +8,8 @@ const api = {
   saveData: (data) => ipcRenderer.invoke('data:save', data),
   getDataPath: () => ipcRenderer.invoke('data:path'),
   getAppVersion: () => ipcRenderer.invoke('app:version'),
+  getAppInfo: () => ipcRenderer.invoke('app:info'),
+  openStartupSettings: () => ipcRenderer.invoke('open:startupSettings'),
   exportData: (data) => ipcRenderer.invoke('data:export', data),
   importData: () => ipcRenderer.invoke('data:import'),
 

@@ -245,6 +245,8 @@ export default {
     trayDesc: 'Pencereyi kapattığında uygulama kapanmaz; gizli simgeler alanındaki tepsi simgesinden yeniden açılır.',
     autoLaunch: 'Windows ile birlikte başlat',
     autoLaunchDesc: 'Bilgisayar açıldığında uygulamayı otomatik çalıştırır.',
+    autoLaunchStoreDesc: "Microsoft Store sürümünde bu ayar Windows'tan yönetilir: Ayarlar → Uygulamalar → Başlangıç.",
+    openStartupSettings: 'Başlangıç ayarlarını aç',
     shortcut: 'Genel kısayol',
     shortcutDesc: 'Uygulama arka plandayken bile komut paletini açar. Örnek: CommandOrControl+Shift+P',
     shortcutSaved: 'Kısayol kaydedildi.',
