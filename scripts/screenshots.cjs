@@ -61,6 +61,11 @@ async function capture(lang) {
   }
   await run(win, 'localStorage.clear(); location.reload()')
   await wait(800)
+  // A hidden window doesn't reliably finish CSS animations before
+  // capturePage, which left the palette half faded in. Turn them off.
+  await win.webContents.insertCSS(
+    '*, *::before, *::after { animation: none !important; transition: none !important; }'
+  )
 
   const suffix = lang === 'en' ? '' : `-${lang}`
   const tasksLabel = lang === 'en' ? 'All tasks' : 'Tüm Görevler'
