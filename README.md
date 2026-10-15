@@ -7,7 +7,9 @@
 **A keyboard-first desktop hub for your local projects.**
 Find any project in a keystroke, open it in your editor, and see its git status and tasks at a glance.
 
-[Download](../../releases/latest) · [Türkçe](README.tr.md) · [Code signing and privacy](CODE_SIGNING.md)
+<a href="https://apps.microsoft.com/detail/9P4T86KQRBVK"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft" /></a>
+
+[Microsoft Store](https://apps.microsoft.com/detail/9P4T86KQRBVK) · [Download the installer](../../releases/latest) · [Türkçe](README.tr.md) · [Code signing and privacy](CODE_SIGNING.md)
 
 <img src="docs/screenshots/home.png" alt="Project Manager home screen" />
 
@@ -36,11 +38,13 @@ Find any project in a keystroke, open it in your editor, and see its git status 
 
 ## Install
 
-Download the latest `proje-yoneticisi-setup-<version>.exe` from [Releases](../../releases/latest) and run it. Windows 10 and 11 are supported.
+**Microsoft Store (recommended):** get it from the [Microsoft Store](https://apps.microsoft.com/detail/9P4T86KQRBVK). The Store version is signed by Microsoft, installs without SmartScreen warnings and updates automatically. Windows 10 (1809) or later.
+
+**Installer:** download the latest `proje-yoneticisi-setup-<version>.exe` from [Releases](../../releases/latest) and run it. Windows 10 and 11 are supported.
 
 The installer is not code-signed, so Windows SmartScreen will warn about an unknown publisher. Choose **More info → Run anyway**. Every installer is built by GitHub Actions from this repository's source; see [code signing and privacy](CODE_SIGNING.md).
 
-To update, install the new version over the old one. Your projects are kept: the app stores its data outside the install folder (see [Your data](#your-data)).
+To update the installer version, install the new version over the old one. Your projects are kept: the app stores its data outside the install folder (see [Your data](#your-data)). The Store version keeps its data separately; to move your projects between the two, use **Settings → Backup** to export and import.
 
 ## Keyboard shortcuts
 

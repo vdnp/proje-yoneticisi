@@ -2,6 +2,8 @@
 
 ## 1.3.0
 
+Now available on the [Microsoft Store](https://apps.microsoft.com/detail/9P4T86KQRBVK).
+
 ### Added
 - Microsoft Store (MSIX) package. The release workflow builds it as a downloadable artifact for Store submission.
 

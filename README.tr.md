@@ -7,7 +7,9 @@
 **Yerel projelerin için klavye odaklı bir masaüstü merkezi.**
 Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevlerini bir bakışta gör.
 
-[İndir](../../releases/latest) · [English](README.md) · [Kod imzalama ve gizlilik](CODE_SIGNING.md)
+<a href="https://apps.microsoft.com/detail/9P4T86KQRBVK"><img src="https://get.microsoft.com/images/tr%20dark.svg" width="200" alt="Microsoft Store'dan edinin" /></a>
+
+[Microsoft Store](https://apps.microsoft.com/detail/9P4T86KQRBVK) · [Kurulum dosyasını indir](../../releases/latest) · [English](README.md) · [Kod imzalama ve gizlilik](CODE_SIGNING.md)
 
 <img src="docs/screenshots/home-tr.png" alt="Proje Yöneticisi ana ekranı" />
 
@@ -36,11 +38,13 @@ Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevler
 
 ## Kurulum
 
-[Releases](../../releases/latest) sayfasından en güncel `proje-yoneticisi-setup-<sürüm>.exe` dosyasını indirip çalıştır. Windows 10 ve 11 desteklenir.
+**Microsoft Store (önerilen):** [Microsoft Store](https://apps.microsoft.com/detail/9P4T86KQRBVK)'dan yükle. Store sürümü Microsoft tarafından imzalanır, SmartScreen uyarısı olmadan kurulur ve kendiliğinden güncellenir. Windows 10 (1809) ve sonrası gerekir.
+
+**Kurulum dosyası:** [Releases](../../releases/latest) sayfasından en güncel `proje-yoneticisi-setup-<sürüm>.exe` dosyasını indirip çalıştır. Windows 10 ve 11 desteklenir.
 
 Kurulum dosyası kod imzalı değil, bu yüzden Windows SmartScreen bilinmeyen yayımcı uyarısı verir. **Daha fazla bilgi → Yine de çalıştır**'ı seç. Her kurulum dosyası bu deponun kaynak kodundan GitHub Actions ile derlenir; ayrıntılar için [kod imzalama ve gizlilik](CODE_SIGNING.md).
 
-Güncellemek için yeni sürümü eskisinin üzerine kur. Projelerin korunur, çünkü uygulama verilerini kurulum klasörünün dışında tutar (bkz. [Verilerin](#verilerin)).
+Kurulum dosyasıyla yüklediysen güncellemek için yeni sürümü eskisinin üzerine kur. Projelerin korunur, çünkü uygulama verilerini kurulum klasörünün dışında tutar (bkz. [Verilerin](#verilerin)). Store sürümü verilerini ayrı bir yerde tutar; projelerini ikisi arasında taşımak için **Ayarlar → Yedekleme** ile dışa aktarıp içe aktar.
 
 ## Klavye kısayolları
 
