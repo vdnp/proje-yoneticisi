@@ -199,7 +199,11 @@ export default function App() {
             />
           )}
           {route.name === 'detail' && (
-            <ProjectDetail projectId={route.projectId} onBack={() => setRoute({ name: 'home' })} />
+            <ProjectDetail
+              projectId={route.projectId}
+              onBack={() => setRoute({ name: 'home' })}
+              onOpenProject={openProject}
+            />
           )}
           {route.name === 'tasks' && <TasksView onOpenProject={openProject} />}
           {route.name === 'settings' && <SettingsView onOpenProject={openProject} />}

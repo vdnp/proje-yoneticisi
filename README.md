@@ -24,7 +24,9 @@ Find any project in a keystroke, open it in your editor, and see its git status 
 - **Quick actions**: open in your editor (per-project choice: VS Code, VS Code Insiders, Cursor, or any command), in a terminal, in Explorer, or on GitHub.
 - **Project pages** with notes, a to-do list, the rendered README and one-click `package.json` scripts.
 - **All tasks**: every project's to-dos in one list.
-- **Organize**: favorites, pinning, color-coded groups (drag cards onto a group), tags and sorting.
+- **Linked projects**: link a frontend to its backend, wherever they live on disk. **Launch** opens them together, each in its own editor, and starts each one's dev script in its own terminal.
+- **Organize**: favorites, pinning, color-coded groups (drag cards onto a group), tags, sorting and a custom order you set by dragging cards.
+- **Bulk actions**: <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+click to select several projects, then favorite, pin, tag, group, link or remove them at once.
 - **Tray menu** with favorites and recent projects; open one without opening the window.
 - **Maintenance**: spots projects whose folder was moved or deleted, re-detects tags, exports and imports backups.
 - **Turkish and English** UI, dark and light themes, eight accent colors.
@@ -51,11 +53,13 @@ To update the installer version, install the new version over the old one. Your 
 | Shortcut | Action |
 | --- | --- |
 | <kbd>Ctrl</kbd>+<kbd>K</kbd> | Command palette |
-| <kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (in the palette) | Open in editor / open the project page |
+| <kbd>Enter</kbd> (in the palette) | Launch the project (with its linked projects and dev script), or open it in the editor |
+| <kbd>Shift</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (in the palette) | Open in the editor only / open the project page |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Bring the app up with the palette open (works from the tray; configurable) |
 | <kbd>Ctrl</kbd>+<kbd>N</kbd> | Add a project |
 | <kbd>Ctrl</kbd>+<kbd>F</kbd> | Search |
 | Arrow keys, <kbd>Enter</kbd> | Move between cards, open one |
+| <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+click, <kbd>Ctrl</kbd>+<kbd>A</kbd> | Select projects / select all (<kbd>Esc</kbd> clears) |
 | <kbd>Esc</kbd> | Back / close |
 
 ## Your data

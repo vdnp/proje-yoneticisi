@@ -18,8 +18,11 @@ import {
   Terminal,
   GitBranch,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Link,
+  X
 } from '../components/Icons.jsx'
+import { isLaunchable, linkedProjects } from '../../../shared/links.js'
 import { cn, relativeTime, formatDate, samePath } from '../lib/utils.js'
 import { GROUP_COLOR_LIST } from '../lib/groups.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
@@ -144,7 +147,112 @@ function RepoCard({ project, onOpenGithub }) {
   )
 }
 
-export default function ProjectDetail({ projectId, onBack }) {
+// Linked projects (e.g. this frontend's backend) and the script Launch starts.
+function LinksCard({ project, scripts, onOpenProject }) {
+  const projects = useStore((s) => s.projects)
+  const linkProjects = useStore((s) => s.linkProjects)
+  const unlinkProjects = useStore((s) => s.unlinkProjects)
+  const updateProject = useStore((s) => s.updateProject)
+  const { t } = useI18n()
+
+  const linked = linkedProjects(project, projects)
+  const candidates = projects
+    .filter((p) => p.id !== project.id && !(project.links || []).includes(p.id))
+    .sort((a, b) => a.name.localeCompare(b.name))
+  const scriptNames = Object.keys(scripts)
+  const missingStart = project.startScript && !scriptNames.includes(project.startScript)
+
+  return (
+    <div className="mt-6 rounded-2xl border border-surface-border bg-surface-card p-4">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-content-primary">
+        <Link size={16} /> {t('detail.links')}
+      </h3>
+      <p className="mt-1 text-xs leading-relaxed text-content-faint">{t('detail.linksHint')}</p>
+
+      <div className="mt-3 flex flex-col gap-1.5">
+        {linked.length === 0 && (
+          <p className="rounded-xl border border-dashed border-surface-border px-3 py-2.5 text-xs text-content-faint">
+            {t('detail.noLinks')}
+          </p>
+        )}
+        {linked.map((p) => (
+          <div
+            key={p.id}
+            className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-bg px-3 py-2"
+          >
+            <button onClick={() => onOpenProject(p.id)} className="min-w-0 flex-1 text-left">
+              <span className="block truncate text-sm font-medium text-content-primary hover:text-brand">
+                {p.name}
+              </span>
+              <span className="block truncate text-[11px] text-content-faint">{p.path}</span>
+            </button>
+            <span
+              className={cn(
+                'shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-medium',
+                p.startScript ? 'bg-emerald-500/10 text-emerald-400' : 'text-content-faint'
+              )}
+            >
+              {p.startScript ? `▶ ${p.startScript}` : t('detail.noStartScript')}
+            </span>
+            <button
+              onClick={() => unlinkProjects(project.id, p.id)}
+              title={t('detail.unlink')}
+              aria-label={t('detail.unlink')}
+              className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-content-faint transition hover:bg-rose-500/15 hover:text-rose-400"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+        {candidates.length > 0 && (
+          <select
+            value=""
+            onChange={(e) => e.target.value && linkProjects([project.id, e.target.value])}
+            aria-label={t('detail.addLink')}
+            className="rounded-lg border border-surface-border bg-surface-bg px-2.5 py-1.5 text-sm text-content-primary focus:outline-none"
+          >
+            <option value="">{t('detail.addLink')}</option>
+            {candidates.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <label className="flex items-center gap-2">
+          <span className="text-content-secondary">{t('detail.startScript')}:</span>
+          {scriptNames.length || project.startScript ? (
+            <select
+              value={project.startScript || ''}
+              onChange={(e) => updateProject(project.id, { startScript: e.target.value })}
+              className="rounded-lg border border-surface-border bg-surface-bg px-2.5 py-1.5 text-sm text-content-primary focus:outline-none"
+            >
+              <option value="">{t('detail.startScriptNone')}</option>
+              {scriptNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+              {missingStart && (
+                <option value={project.startScript}>
+                  {t('detail.startScriptMissing', { script: project.startScript })}
+                </option>
+              )}
+            </select>
+          ) : (
+            <span className="text-xs text-content-faint">{t('detail.noScriptsForStart')}</span>
+          )}
+        </label>
+      </div>
+    </div>
+  )
+}
+
+export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
   const project = useStore((s) => s.projects.find((p) => p.id === projectId))
   const projects = useStore((s) => s.projects)
   const groups = useStore((s) => s.groups)
@@ -393,10 +501,18 @@ export default function ProjectDetail({ projectId, onBack }) {
 
         {/* actions */}
         <div className="mt-5 flex flex-wrap gap-2">
+          {isLaunchable(project) && (
+            <ActionBtn
+              icon={Play}
+              label={t('detail.actions.launch')}
+              tone="primary"
+              onClick={() => actions.launch(project)}
+            />
+          )}
           <ActionBtn
             icon={Code}
             label={t('detail.actions.openEditor')}
-            tone="primary"
+            tone={isLaunchable(project) ? 'default' : 'primary'}
             onClick={() => actions.openInEditor(project)}
           />
           <ActionBtn
@@ -511,6 +627,8 @@ export default function ProjectDetail({ projectId, onBack }) {
             />
           </div>
         </div>
+
+        <LinksCard project={project} scripts={scripts} onOpenProject={onOpenProject} />
 
         {/* package.json scripts */}
         {Object.keys(scripts).length > 0 && (

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+
+### Added
+- **Linked projects.** Link projects to each other (a frontend and its backend, say), even when their folders are in different places. Linked projects show on each other's cards and are managed from the new "Linked projects" section of the project page.
+- **Launch.** Opens a project together with its linked projects, each in its own editor, and starts each one's chosen "run on launch" script (a package.json script such as `dev`) in its own terminal. Available from the cards, the project page, the tray menu and the command palette (<kbd>Enter</kbd>; <kbd>Shift</kbd>+<kbd>Enter</kbd> opens the editor only).
+- **Custom order.** A new "Custom order" sort lets you arrange projects by dragging cards. The chosen sort is now remembered.
+- **Bulk actions.** Select several projects with <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+click or <kbd>Ctrl</kbd>+<kbd>A</kbd>, then favorite, pin, tag, move to a group, link or remove them at once. Dragging a selection onto a sidebar group moves all of it.
+
 ## 1.3.0
 
 Now available on the [Microsoft Store](https://apps.microsoft.com/detail/9P4T86KQRBVK).

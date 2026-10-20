@@ -170,3 +170,15 @@ export const Dots = make(
     <circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none" />
   </>
 )
+export const Link = make(
+  <>
+    <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07L11.5 4.4" />
+    <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" />
+  </>
+)
+export const Tag = make(
+  <>
+    <path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z" />
+    <circle cx="7.5" cy="7.5" r="1.2" />
+  </>
+)

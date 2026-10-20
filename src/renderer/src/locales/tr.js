@@ -44,6 +44,7 @@ export default {
     scan: 'Tara',
     scanTitle: 'Kök klasörü tara',
     sort: {
+      custom: 'Özel sıra',
       modified: 'Son düzenlenme',
       opened: 'Son açılma',
       name: 'İsim (A-Z)',
@@ -53,6 +54,7 @@ export default {
     listView: 'Liste görünümü',
     recent: 'Son Açılanlar',
     pinnedFirst: 'sabitlenenler üstte',
+    reorderHint: 'sıralamak için kartları sürükle',
     noResults: 'Sonuç bulunamadı',
     noResultsBody: 'Arama ya da filtreyle eşleşen proje yok.',
     welcome: {
@@ -77,7 +79,27 @@ export default {
     tasksDone: '{done}/{total} görev tamamlandı',
     repo: 'depo',
     missing: 'Klasör bulunamadı',
-    openTasks: '{count} açık görev'
+    openTasks: '{count} açık görev',
+    select: 'Seç (Ctrl veya Shift ile tıklayarak da seçebilirsin)',
+    linked: 'Bağlı: {names}',
+    launchTitle: 'Başlat: {what}'
+  },
+  selection: {
+    count: '{count} proje seçildi',
+    favorite: 'Favorilere ekle',
+    unfavorite: 'Favorilerden çıkar',
+    pin: 'Sabitle',
+    unpin: 'Sabitlemeyi kaldır',
+    moveToGroup: 'Gruba taşı…',
+    moved: 'Gruba taşındı.',
+    addTag: 'Etiket ekle',
+    tagPlaceholder: 'Etiket adı',
+    tagged: '"{tag}" etiketi eklendi.',
+    link: 'Birbirine bağla',
+    linked: 'Projeler birbirine bağlandı.',
+    remove: 'Listeden kaldır',
+    confirmRemove: '{count} proje listeden kaldırılsın mı?\n(Klasörler diskten silinmez.)',
+    clear: 'Seçimi temizle'
   },
   git: {
     title: 'Git durumu',
@@ -104,6 +126,7 @@ export default {
     tagsPlaceholder: 'Etiketler (virgülle ayır)',
     noDescription: 'Açıklama eklenmemiş.',
     actions: {
+      launch: 'Başlat',
       openEditor: 'Editörde Aç',
       showFolder: 'Klasörde Göster',
       openTerminal: 'Terminalde Aç',
@@ -138,7 +161,18 @@ export default {
     missingTitle: 'Bu projenin klasörü bulunamadı',
     missingBody: 'Klasör taşınmış ya da silinmiş olabilir: {path}',
     relocate: 'Yeniden konumlandır',
-    relocated: 'Klasör güncellendi.'
+    relocated: 'Klasör güncellendi.',
+    links: 'Bağlı projeler',
+    linksHint:
+      "Örneğin bir frontend'i backend'ine bağla. Başlat'a bastığında bağlı projeler de kendi editörlerinde açılır; başlangıç script'i seçilmiş olanlarda script ayrı bir terminalde çalışır.",
+    noLinks: 'Henüz bağlı proje yok.',
+    addLink: 'Proje bağla…',
+    unlink: 'Bağlantıyı kaldır',
+    startScript: "Başlatınca çalıştır",
+    startScriptNone: 'Hiçbiri',
+    startScriptMissing: "{script} (package.json'da yok)",
+    noScriptsForStart: "Bu projede package.json script'i yok.",
+    noStartScript: 'script yok'
   },
   tasks: {
     title: 'Tüm Görevler',
@@ -210,6 +244,8 @@ export default {
     noResults: 'Sonuç yok.',
     navigate: 'gez',
     openEditor: 'editörde aç',
+    launch: 'başlat',
+    editorOnly: 'yalnızca editör',
     details: 'detay',
     close: 'kapat',
     cmd: {
@@ -279,7 +315,9 @@ export default {
     missing: 'Klasör bulunamadı:\n{path}',
     editorFailed: '"{command}" ile açılamadı. Komutu Ayarlar → Editörler bölümünden kontrol et.',
     commandNotFound: '"{command}" komutu bulunamadı; bu editör kurulu değil gibi görünüyor. Ayarlar → Editörler bölümünden başka bir editör seçebilirsin.',
-    terminalFailed: 'Terminal açılamadı.'
+    terminalFailed: 'Terminal açılamadı.',
+    scriptFailed: '"{script}" script\'i çalıştırılamadı:',
+    launchProblems: 'Başlatırken bazı adımlar tamamlanamadı:'
   },
   errors: {
     not_found: 'Klasör bulunamadı.',

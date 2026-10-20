@@ -1,45 +1,46 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ProjectCard from '../components/ProjectCard.jsx'
 import ProjectRow from '../components/ProjectRow.jsx'
+import SelectionBar from '../components/SelectionBar.jsx'
 import { Search, Grid, List, Clock, Plus, Scan, Pin, Folder } from '../components/Icons.jsx'
 import { cn } from '../lib/utils.js'
 import { fuzzyScoreAny } from '../lib/fuzzy.js'
+import { SORTS, sortProjects, customOrderIds, moveIds } from '../lib/sort.js'
 import { useI18n } from '../lib/i18n.js'
 import useStore from '../store/useStore.js'
 
-const SORTS = ['modified', 'opened', 'name', 'favorite']
-
-function sortProjects(list, sort) {
-  const arr = [...list]
-  const by = {
-    name: (a, b) => a.name.localeCompare(b.name),
-    opened: (a, b) => (b.lastOpenedAt || 0) - (a.lastOpenedAt || 0),
-    favorite: (a, b) =>
-      Number(b.favorite) - Number(a.favorite) || (b.lastModified || 0) - (a.lastModified || 0),
-    modified: (a, b) => (b.lastModified || 0) - (a.lastModified || 0)
-  }
-  // Pinned projects always float to the top, whatever the sort.
-  return arr.sort(
-    (a, b) => Number(!!b.pinned) - Number(!!a.pinned) || (by[sort] || by.modified)(a, b)
-  )
-}
+const DRAG_TYPE = 'application/x-project-id'
 
 export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboardActive }) {
   const projects = useStore((s) => s.projects)
   const groups = useStore((s) => s.groups)
   const settings = useStore((s) => s.settings)
   const updateSettings = useStore((s) => s.updateSettings)
+  const setOrder = useStore((s) => s.setOrder)
   const { t } = useI18n()
 
   const [query, setQuery] = useState('')
-  const [sort, setSort] = useState('modified')
   const [activeTag, setActiveTag] = useState(null)
   const [cursor, setCursor] = useState(-1)
+  const [checked, setChecked] = useState([]) // bulk selection (project ids)
+  const [dropTarget, setDropTarget] = useState(null) // { id, side } while reordering
+  const anchorRef = useRef(null) // last toggled id, for Shift+click ranges
+  const dragIdsRef = useRef([])
   const searchRef = useRef(null)
   const gridRef = useRef(null)
 
   const viewMode = settings.viewMode || 'grid'
   const setViewMode = (m) => updateSettings({ viewMode: m })
+  const sort = SORTS.includes(settings.sort) ? settings.sort : 'modified'
+
+  // The first switch to the custom order starts from what is on screen now,
+  // rather than reshuffling everything by date added.
+  const setSort = (next) => {
+    if (next === 'custom' && projects.every((p) => p.order == null)) {
+      setOrder(sortProjects(projects, sort).map((p) => p.id))
+    }
+    updateSettings({ sort: next })
+  }
 
   useEffect(() => {
     const focus = () => searchRef.current?.focus()
@@ -85,6 +86,102 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
 
   // Reset the keyboard cursor whenever the list changes shape.
   useEffect(() => setCursor(-1), [query, filter, activeTag, sort])
+
+  // ---- bulk selection ----
+  // Switching to another list (sidebar filter, tag) starts a fresh selection.
+  useEffect(() => setChecked([]), [filter, activeTag])
+  // Ids of projects removed meanwhile drop out.
+  const checkedIds = useMemo(
+    () => checked.filter((id) => projects.some((p) => p.id === id)),
+    [checked, projects]
+  )
+  const selecting = checkedIds.length > 0
+
+  const toggleChecked = useCallback((project) => {
+    anchorRef.current = project.id
+    setChecked((ids) =>
+      ids.includes(project.id) ? ids.filter((id) => id !== project.id) : [...ids, project.id]
+    )
+  }, [])
+
+  // Ctrl+click toggles, Shift+click selects a range, and once anything is
+  // selected a plain click toggles too. Otherwise a click opens the project.
+  const onCardClick = (e, project) => {
+    if (e.shiftKey && anchorRef.current) {
+      const ids = filtered.map((p) => p.id)
+      const a = ids.indexOf(anchorRef.current)
+      const b = ids.indexOf(project.id)
+      if (a >= 0 && b >= 0) {
+        const range = ids.slice(Math.min(a, b), Math.max(a, b) + 1)
+        setChecked((cur) => [...new Set([...cur, ...range])])
+        return
+      }
+    }
+    if (e.ctrlKey || e.metaKey || e.shiftKey || selecting) return toggleChecked(project)
+    onOpenProject(project.id)
+  }
+
+  useEffect(() => {
+    if (!keyboardActive) return
+    const onKey = (e) => {
+      // Text fields keep their own Ctrl+A / Esc; a focused <select> (e.g.
+      // right after picking a sort) shouldn't swallow them.
+      const tag = document.activeElement?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+        e.preventDefault()
+        setChecked(filtered.map((p) => p.id))
+      } else if (e.key === 'Escape' && checked.length) {
+        setChecked([])
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [keyboardActive, filtered, checked.length])
+
+  // ---- drag to reorder (custom order, no search active) ----
+  const reorderable = sort === 'custom' && !query.trim()
+
+  const dndFor = (project) => ({
+    side: dropTarget?.id === project.id ? dropTarget.side : null,
+    onDragStart: (e) => {
+      // Dragging one of the selected cards carries the whole selection.
+      const ids = checkedIds.includes(project.id)
+        ? filtered.filter((p) => checkedIds.includes(p.id)).map((p) => p.id)
+        : [project.id]
+      dragIdsRef.current = ids
+      e.dataTransfer.setData(DRAG_TYPE, ids.join(','))
+      e.dataTransfer.effectAllowed = 'move'
+    },
+    onDragOver: (e) => {
+      if (!reorderable || !dragIdsRef.current.length) return
+      if (dragIdsRef.current.includes(project.id)) return setDropTarget(null)
+      e.preventDefault()
+      const r = e.currentTarget.getBoundingClientRect()
+      let side
+      if (viewMode === 'list') side = e.clientY > r.top + r.height / 2 ? 'bottom' : 'top'
+      else side = e.clientX > r.left + r.width / 2 ? 'right' : 'left'
+      if (dropTarget?.id !== project.id || dropTarget.side !== side) {
+        setDropTarget({ id: project.id, side })
+      }
+    },
+    onDragLeave: (e) => {
+      if (!e.currentTarget.contains(e.relatedTarget)) {
+        setDropTarget((d) => (d?.id === project.id ? null : d))
+      }
+    },
+    onDrop: (e) => {
+      if (!reorderable || !dragIdsRef.current.length) return
+      e.preventDefault()
+      const after = dropTarget?.side === 'right' || dropTarget?.side === 'bottom'
+      setOrder(moveIds(customOrderIds(projects), dragIdsRef.current, project.id, after))
+      setDropTarget(null)
+    },
+    onDragEnd: () => {
+      dragIdsRef.current = []
+      setDropTarget(null)
+    }
+  })
 
   // ---- arrow-key navigation over the cards ----
   useEffect(() => {
@@ -140,6 +237,17 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
   }, [cursor])
 
   const showRecent = filter === 'all' && !query && !activeTag && recent.length > 0
+
+  const itemProps = (p, i) => ({
+    project: p,
+    onOpen: onOpenProject,
+    selected: i === cursor,
+    checked: checkedIds.includes(p.id),
+    selectionActive: selecting,
+    onCardClick,
+    onToggleCheck: toggleChecked,
+    dnd: dndFor(p)
+  })
   const heading =
     filter === 'favorites' ? t('nav.favorites') : activeGroup ? activeGroup.name : t('nav.all')
 
@@ -264,6 +372,9 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
               <Pin size={11} /> {t('home.pinnedFirst')}
             </span>
           )}
+          {reorderable && filtered.length > 1 && (
+            <span className="text-[11px] text-content-faint">· {t('home.reorderHint')}</span>
+          )}
         </div>
 
         {filtered.length === 0 ? (
@@ -279,17 +390,19 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
             className="grid animate-fadein grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
           >
             {filtered.map((p, i) => (
-              <ProjectCard key={p.id} project={p} onOpen={onOpenProject} selected={i === cursor} />
+              <ProjectCard key={p.id} {...itemProps(p, i)} />
             ))}
           </div>
         ) : (
           <div ref={gridRef} className="flex animate-fadein flex-col gap-2">
             {filtered.map((p, i) => (
-              <ProjectRow key={p.id} project={p} onOpen={onOpenProject} selected={i === cursor} />
+              <ProjectRow key={p.id} {...itemProps(p, i)} />
             ))}
           </div>
         )}
       </div>
+
+      {selecting && <SelectionBar ids={checkedIds} onClear={() => setChecked([])} />}
     </div>
   )
 }

@@ -45,6 +45,7 @@ export default {
     scan: 'Scan',
     scanTitle: 'Scan a root folder',
     sort: {
+      custom: 'Custom order',
       modified: 'Last modified',
       opened: 'Last opened',
       name: 'Name (A–Z)',
@@ -54,6 +55,7 @@ export default {
     listView: 'List view',
     recent: 'Recently opened',
     pinnedFirst: 'pinned on top',
+    reorderHint: 'drag cards to reorder',
     noResults: 'No results',
     noResultsBody: 'No project matches your search or filter.',
     welcome: {
@@ -79,7 +81,29 @@ export default {
     repo: 'repo',
     missing: 'Folder not found',
     openTasks_one: '{count} open task',
-    openTasks_other: '{count} open tasks'
+    openTasks_other: '{count} open tasks',
+    select: 'Select (Ctrl+click or Shift+click works too)',
+    linked: 'Linked: {names}',
+    launchTitle: 'Launch: {what}'
+  },
+  selection: {
+    count_one: '{count} project selected',
+    count_other: '{count} projects selected',
+    favorite: 'Add to favorites',
+    unfavorite: 'Remove from favorites',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    moveToGroup: 'Move to group…',
+    moved: 'Moved to the group.',
+    addTag: 'Add tag',
+    tagPlaceholder: 'Tag name',
+    tagged: 'Added the "{tag}" tag.',
+    link: 'Link together',
+    linked: 'Projects linked.',
+    remove: 'Remove from list',
+    confirmRemove_one: 'Remove {count} project from the list?\n(The folder stays on disk.)',
+    confirmRemove_other: 'Remove {count} projects from the list?\n(The folders stay on disk.)',
+    clear: 'Clear selection'
   },
   git: {
     title: 'Git status',
@@ -110,6 +134,7 @@ export default {
     tagsPlaceholder: 'Tags (comma separated)',
     noDescription: 'No description.',
     actions: {
+      launch: 'Launch',
       openEditor: 'Open in editor',
       showFolder: 'Show in folder',
       openTerminal: 'Open in terminal',
@@ -144,7 +169,18 @@ export default {
     missingTitle: "This project's folder can't be found",
     missingBody: 'It may have been moved or deleted: {path}',
     relocate: 'Locate folder',
-    relocated: 'Folder updated.'
+    relocated: 'Folder updated.',
+    links: 'Linked projects',
+    linksHint:
+      'Link a frontend to its backend, for example. Launch then opens the linked projects too, each in its own editor, and starts the launch script of each project that has one in its own terminal.',
+    noLinks: 'No linked projects yet.',
+    addLink: 'Link a project…',
+    unlink: 'Unlink',
+    startScript: 'Run on launch',
+    startScriptNone: 'None',
+    startScriptMissing: '{script} (not in package.json)',
+    noScriptsForStart: 'This project has no package.json scripts.',
+    noStartScript: 'no script'
   },
   tasks: {
     title: 'All tasks',
@@ -219,6 +255,8 @@ export default {
     noResults: 'No results.',
     navigate: 'navigate',
     openEditor: 'open in editor',
+    launch: 'launch',
+    editorOnly: 'editor only',
     details: 'details',
     close: 'close',
     cmd: {
@@ -290,7 +328,9 @@ export default {
     missing: 'Folder not found:\n{path}',
     editorFailed: 'Couldn\'t open with "{command}". Check the command under Settings → Editors.',
     commandNotFound: 'The command "{command}" wasn\'t found, so this editor doesn\'t seem to be installed. You can pick another one under Settings → Editors.',
-    terminalFailed: "Couldn't open a terminal."
+    terminalFailed: "Couldn't open a terminal.",
+    scriptFailed: 'Couldn\'t run the "{script}" script:',
+    launchProblems: 'Some steps of the launch failed:'
   },
   errors: {
     not_found: 'Folder not found.',

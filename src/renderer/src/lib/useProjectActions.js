@@ -1,6 +1,7 @@
 import api from './api.js'
 import { useI18n, errorText } from './i18n.js'
 import useStore from '../store/useStore.js'
+import { launchPlan } from '../../../shared/links.js'
 
 // Centralizes the "quick actions". Each successful open bumps the project's
 // lastOpenedAt / openCount via markOpened.
@@ -50,6 +51,27 @@ export function useProjectActions() {
       const res = await api.openInExplorer(project.path)
       if (res?.ok) return markOpened(project.id)
       reportFailure(project, res, errorText(t, res?.error))
+    },
+    // Open the project and its linked projects, each in its own editor, and
+    // start their dev scripts. One summary alert lists whatever failed.
+    launch: async (project) => {
+      const plan = launchPlan(project, useStore.getState().projects, settings.defaultEditor)
+      if (!plan.length) return alert(t('actions.noPath'))
+      const results = (await api.launch(plan)) || []
+      const problems = []
+      for (const r of results) {
+        const step = plan.find((s) => s.id === r.id)
+        if (r.ok) markOpened(r.id)
+        else if (r.error === 'command_not_found') {
+          problems.push(`${r.name}: ${t('actions.commandNotFound', { command: step?.command })}`)
+        } else problems.push(`${r.name}: ${errorText(t, r.error)}`)
+        if (r.scriptError) {
+          const failed = t('actions.scriptFailed', { script: step?.script })
+          problems.push(`${r.name}: ${failed} ${errorText(t, r.scriptError)}`)
+        }
+      }
+      if (results.some((r) => r.error === 'not_found')) checkMissing()
+      if (problems.length) alert(`${t('actions.launchProblems')}\n\n${problems.join('\n')}`)
     },
     openGithub: async (project) => {
       if (!project.gitUrl) return alert(t('actions.noGithub'))

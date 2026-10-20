@@ -19,6 +19,7 @@ const api = {
   scanRoot: (rootPath) => ipcRenderer.invoke('project:scanRoot', rootPath),
   getScripts: (folderPath) => ipcRenderer.invoke('project:scripts', folderPath),
   runScript: (folderPath, script) => ipcRenderer.invoke('project:runScript', { folderPath, script }),
+  launch: (plan) => ipcRenderer.invoke('project:launch', plan),
   getReadme: (folderPath) => ipcRenderer.invoke('project:readme', folderPath),
   checkPaths: (paths) => ipcRenderer.invoke('fs:checkPaths', paths),
   getLastCommit: (folderPath) => ipcRenderer.invoke('git:lastCommit', folderPath),

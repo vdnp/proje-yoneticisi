@@ -42,6 +42,8 @@ const SAMPLE = {
       groupId: 'g1',
       color: '',
       editorCommand: '',
+      links: ['p2'],
+      startScript: 'dev',
       notes: L('Sürüm öncesi: grafik önbelleğini kontrol et.', 'Before release: double-check chart caching.'),
       todos: todos('a', [
         [L('Oturum zaman aşımını düzelt', 'Fix session timeout'), true],
@@ -72,6 +74,7 @@ const SAMPLE = {
       groupId: 'g1',
       color: '',
       editorCommand: '',
+      links: ['p1'],
       notes: '',
       todos: todos('b', [
         [L('Sayfalama parametrelerini doğrula', 'Validate pagination params'), false],
@@ -241,7 +244,7 @@ pnpm dev
 > Contributions are welcome — see [the contributing guide](https://example.com/contributing).
 `
 
-const KEY = 'pm_mock_data_v2'
+const KEY = 'pm_mock_data_v3'
 const nameOf = (path) => (path || '').split('\\').pop()
 
 function read() {
@@ -355,6 +358,10 @@ const mockApi = {
   runScript: async (folderPath, script) => {
     preview(script)
     return { ok: true }
+  },
+  launch: async (plan) => {
+    preview(plan.map((s) => (s.script ? `${s.name} (${s.script})` : s.name)).join(' + '))
+    return plan.map((s) => ({ id: s.id, name: s.name, ok: true }))
   },
   getReadme: async (folderPath) =>
     GIT[nameOf(folderPath)] ? { ok: true, name: 'README.md', content: README, markdown: true } : { ok: false },

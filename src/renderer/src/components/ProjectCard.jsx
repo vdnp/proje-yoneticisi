@@ -10,8 +10,11 @@ import {
   Github,
   Clock,
   CheckSquare,
-  AlertTriangle
+  AlertTriangle,
+  Play
 } from './Icons.jsx'
+import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle } from './ProjectBits.jsx'
+import { isLaunchable } from '../../../shared/links.js'
 import { cn, relativeTime, todoProgress } from '../lib/utils.js'
 import { projectColorHex } from '../lib/groups.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
@@ -39,7 +42,19 @@ function ActionButton({ title, onClick, children, disabled }) {
   )
 }
 
-export default function ProjectCard({ project, onOpen, selected }) {
+// `onCardClick`, `checked`/`onToggleCheck` and `dnd` come from the main list
+// (bulk selection, reordering); the "recently opened" strip leaves them out
+// and a click simply opens the project.
+export default function ProjectCard({
+  project,
+  onOpen,
+  selected,
+  checked = false,
+  selectionActive = false,
+  onCardClick,
+  onToggleCheck,
+  dnd
+}) {
   const toggleFavorite = useStore((s) => s.toggleFavorite)
   const togglePin = useStore((s) => s.togglePin)
   const groups = useStore((s) => s.groups)
@@ -48,20 +63,31 @@ export default function ProjectCard({ project, onOpen, selected }) {
   const { t, lang } = useI18n()
   const { done, total, open } = todoProgress(project)
   const color = projectColorHex(project, groups)
+  const linked = useLinked(project)
 
   return (
     <div
-      onClick={() => onOpen(project.id)}
-      // Dragging a card onto a sidebar group assigns it to that group.
+      onClick={(e) => (onCardClick ? onCardClick(e, project) : onOpen(project.id))}
+      // Dragging a card onto a sidebar group assigns it to that group; in the
+      // custom order it also reorders the list.
       draggable
       onDragStart={(e) => {
+        if (dnd) return dnd.onDragStart(e)
         e.dataTransfer.setData('application/x-project-id', project.id)
         e.dataTransfer.effectAllowed = 'move'
       }}
+      onDragOver={dnd?.onDragOver}
+      onDragLeave={dnd?.onDragLeave}
+      onDrop={dnd?.onDrop}
+      onDragEnd={dnd?.onDragEnd}
+      style={dropStyle(dnd?.side)}
       className={cn(
         'group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-surface-card p-4',
         'shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover',
-        selected ? 'border-brand ring-2 ring-brand/30' : 'border-surface-border hover:border-brand/40'
+        selected || checked
+          ? 'border-brand ring-2 ring-brand/30'
+          : 'border-surface-border hover:border-brand/40',
+        checked && 'bg-brand/5'
       )}
     >
       {/* group color accent */}
@@ -80,6 +106,11 @@ export default function ProjectCard({ project, onOpen, selected }) {
         </div>
 
         <div className="flex shrink-0 items-center gap-0.5">
+          {onToggleCheck && (
+            <span className="mr-1 flex items-center">
+              <SelectBox checked={checked} visible={selectionActive} onToggle={() => onToggleCheck(project)} />
+            </span>
+          )}
           <button
             title={project.pinned ? t('card.unpin') : t('card.pin')}
             aria-label={project.pinned ? t('card.unpin') : t('card.pin')}
@@ -126,6 +157,7 @@ export default function ProjectCard({ project, onOpen, selected }) {
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        <LinkChip linked={linked} />
         <PackageManagerBadge pm={project.packageManager} tags={project.tags} />
         {(project.tags || []).slice(0, 3).map((tag) => (
           <TagBadge key={tag} label={tag} />
@@ -155,6 +187,11 @@ export default function ProjectCard({ project, onOpen, selected }) {
 
       <div className="mt-3 flex items-center justify-between border-t border-surface-border pt-3">
         <div className="flex items-center gap-0.5">
+          {isLaunchable(project) && (
+            <ActionButton title={launchTitle(t, project, linked)} onClick={() => actions.launch(project)}>
+              <Play size={15} className="text-brand" />
+            </ActionButton>
+          )}
           <ActionButton title={t('card.openEditor')} onClick={() => actions.openInEditor(project)}>
             <Code size={16} />
           </ActionButton>
@@ -174,7 +211,7 @@ export default function ProjectCard({ project, onOpen, selected }) {
         </div>
         {open > 0 && (
           <span
-            className="rounded-md bg-surface-hover px-1.5 py-0.5 text-[11px] font-medium text-content-secondary"
+            className="shrink-0 whitespace-nowrap rounded-md bg-surface-hover px-1.5 py-0.5 text-[11px] font-medium text-content-secondary"
             title={t('card.openTasks', { count: open })}
           >
             🔲 {open}

@@ -19,11 +19,12 @@ function NavItem({ active, onClick, icon: Icon, label, count, dot, onDropProject
       onDragLeave={() => setOver(false)}
       onDrop={(e) => {
         if (!onDropProject) return
-        const id = e.dataTransfer.getData('application/x-project-id')
+        // One id, or several comma-separated ones when a bulk selection is dragged.
+        const ids = e.dataTransfer.getData('application/x-project-id').split(',').filter(Boolean)
         setOver(false)
-        if (id) {
+        if (ids.length) {
           e.preventDefault()
-          onDropProject(id)
+          ids.forEach(onDropProject)
         }
       }}
       className={cn(

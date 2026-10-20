@@ -1,6 +1,8 @@
 // Data schema, defaults and migrations. Deliberately free of any Electron
 // imports so it stays a pure, testable module.
 
+import { sanitizeLinks } from '../shared/links.js'
+
 export const DATA_VERSION = 3
 
 export const DEFAULT_DATA = {
@@ -21,7 +23,8 @@ export const DEFAULT_DATA = {
     defaultRoot: '',
     autoLaunch: false,
     globalShortcut: 'CommandOrControl+Shift+P',
-    viewMode: 'grid'
+    viewMode: 'grid',
+    sort: 'modified' // 'modified' | 'opened' | 'name' | 'favorite' | 'custom'
   }
 }
 
@@ -51,6 +54,11 @@ function normalizeProject(p) {
     groupId: str(p.groupId) || null,
     color: str(p.color),
     editorCommand: str(p.editorCommand),
+    // Linked projects (ids) and the package.json script "Launch" starts.
+    links: arr(p.links).filter((id) => typeof id === 'string'),
+    startScript: str(p.startScript),
+    // Position in the "custom order" sort; null = not placed yet.
+    order: num(p.order),
     notes: str(p.notes),
     todos: arr(p.todos)
       .filter((t) => t && typeof t.text === 'string')
@@ -91,6 +99,10 @@ export function hydrate(parsed) {
     }
     if (s.defaultEditor === 'code') s.defaultEditor = 'code-insiders'
   }
+
+  // A hand-edited file or a partial backup can leave one-way links or links
+  // to removed projects behind.
+  data.projects = sanitizeLinks(data.projects)
 
   data.version = DATA_VERSION
   return data

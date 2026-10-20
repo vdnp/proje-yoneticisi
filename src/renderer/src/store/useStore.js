@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import api from '../lib/api.js'
 import { newId, samePath } from '../lib/utils.js'
 import { applyTheme } from '../lib/theme.js'
+import { sanitizeLinks, linkAll, unlinkPair } from '../../../shared/links.js'
 
 // Debounced persistence: any mutation calls persist(), which batches writes
 // to the backend (JSON file in Electron, localStorage in the browser).
@@ -73,15 +74,27 @@ const useStore = create((set, get) => ({
     const allGroups = new Set([...knownGroups, ...newGroups.map((g) => g.id)])
     const knownIds = new Set(projects.map((p) => p.id))
 
-    const added = (data.projects || [])
-      .filter((p) => p.path && !projects.some((q) => samePath(q.path, p.path)))
-      .map((p) => ({
-        ...p,
-        id: knownIds.has(p.id) ? newId() : p.id,
-        groupId: allGroups.has(p.groupId) ? p.groupId : null
-      }))
+    // Imported ids can change (clash) or point at a project that is already
+    // here under another id (same folder); links follow either way.
+    const idMap = new Map()
+    const added = []
+    for (const p of data.projects || []) {
+      if (!p.path) continue
+      const existing = projects.find((q) => samePath(q.path, p.path))
+      if (existing) {
+        idMap.set(p.id, existing.id)
+        continue
+      }
+      const id = knownIds.has(p.id) ? newId() : p.id
+      idMap.set(p.id, id)
+      added.push({ ...p, id, groupId: allGroups.has(p.groupId) ? p.groupId : null })
+    }
+    for (const p of added) p.links = (p.links || []).map((id) => idMap.get(id) || id)
 
-    set({ projects: [...added, ...projects], groups: [...groups, ...newGroups] })
+    set({
+      projects: sanitizeLinks([...added, ...projects]),
+      groups: [...groups, ...newGroups]
+    })
     schedulePersist(get)
     return added.length
   },
@@ -139,6 +152,9 @@ const useStore = create((set, get) => ({
       groupId: partial.groupId ?? null,
       color: partial.color || '',
       editorCommand: '',
+      links: [],
+      startScript: '',
+      order: null,
       notes: '',
       todos: [],
       lastModified: partial.lastModified || Date.now(),
@@ -158,8 +174,52 @@ const useStore = create((set, get) => ({
     schedulePersist(get)
   },
 
-  removeProject: (id) => {
-    set((s) => ({ projects: s.projects.filter((p) => p.id !== id) }))
+  removeProject: (id) => get().removeProjects([id]),
+
+  removeProjects: (ids) => {
+    const gone = new Set(ids)
+    set((s) => ({ projects: sanitizeLinks(s.projects.filter((p) => !gone.has(p.id))) }))
+    schedulePersist(get)
+  },
+
+  // ---- several projects at once (bulk selection) ----
+  updateProjects: (ids, patch) => {
+    const set_ = new Set(ids)
+    set((s) => ({ projects: s.projects.map((p) => (set_.has(p.id) ? { ...p, ...patch } : p)) }))
+    schedulePersist(get)
+  },
+
+  addTag: (ids, tag) => {
+    const clean = tag.trim()
+    if (!clean) return
+    const set_ = new Set(ids)
+    set((s) => ({
+      projects: s.projects.map((p) =>
+        set_.has(p.id) && !(p.tags || []).includes(clean) ? { ...p, tags: [...(p.tags || []), clean] } : p
+      )
+    }))
+    schedulePersist(get)
+  },
+
+  // ---- links ----
+  linkProjects: (ids) => {
+    if (ids.length < 2) return
+    set((s) => ({ projects: linkAll(s.projects, ids) }))
+    schedulePersist(get)
+  },
+
+  unlinkProjects: (a, b) => {
+    set((s) => ({ projects: unlinkPair(s.projects, a, b) }))
+    schedulePersist(get)
+  },
+
+  // ---- custom order ----
+  // `orderedIds` is the full list in its new order.
+  setOrder: (orderedIds) => {
+    const pos = new Map(orderedIds.map((id, i) => [id, i]))
+    set((s) => ({
+      projects: s.projects.map((p) => (pos.has(p.id) ? { ...p, order: pos.get(p.id) } : p))
+    }))
     schedulePersist(get)
   },
 

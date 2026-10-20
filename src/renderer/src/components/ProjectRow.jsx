@@ -1,7 +1,9 @@
 import TagBadge from './TagBadge.jsx'
 import PackageManagerBadge from './PackageManagerBadge.jsx'
 import GitBadge from './GitBadge.jsx'
-import { Star, Pin, Code, Folder, Terminal, Github, CheckSquare, AlertTriangle } from './Icons.jsx'
+import { Star, Pin, Code, Folder, Terminal, Github, CheckSquare, AlertTriangle, Play } from './Icons.jsx'
+import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle } from './ProjectBits.jsx'
+import { isLaunchable } from '../../../shared/links.js'
 import { cn, relativeTime, todoProgress } from '../lib/utils.js'
 import { projectColorHex } from '../lib/groups.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
@@ -29,7 +31,17 @@ function IconBtn({ title, onClick, children, disabled }) {
   )
 }
 
-export default function ProjectRow({ project, onOpen, selected }) {
+// Same props as ProjectCard.
+export default function ProjectRow({
+  project,
+  onOpen,
+  selected,
+  checked = false,
+  selectionActive = false,
+  onCardClick,
+  onToggleCheck,
+  dnd
+}) {
   const toggleFavorite = useStore((s) => s.toggleFavorite)
   const togglePin = useStore((s) => s.togglePin)
   const groups = useStore((s) => s.groups)
@@ -38,20 +50,28 @@ export default function ProjectRow({ project, onOpen, selected }) {
   const { t, lang } = useI18n()
   const { done, total, open } = todoProgress(project)
   const color = projectColorHex(project, groups)
+  const linked = useLinked(project)
 
   return (
     <div
-      onClick={() => onOpen(project.id)}
+      onClick={(e) => (onCardClick ? onCardClick(e, project) : onOpen(project.id))}
       draggable
       onDragStart={(e) => {
+        if (dnd) return dnd.onDragStart(e)
         e.dataTransfer.setData('application/x-project-id', project.id)
         e.dataTransfer.effectAllowed = 'move'
       }}
+      onDragOver={dnd?.onDragOver}
+      onDragLeave={dnd?.onDragLeave}
+      onDrop={dnd?.onDrop}
+      onDragEnd={dnd?.onDragEnd}
+      style={dropStyle(dnd?.side)}
       className={cn(
         'group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border bg-surface-card px-3 py-2.5 transition',
-        selected
+        selected || checked
           ? 'border-brand ring-2 ring-brand/30'
-          : 'border-surface-border hover:border-brand/40 hover:bg-surface-hover'
+          : 'border-surface-border hover:border-brand/40 hover:bg-surface-hover',
+        checked && 'bg-brand/5'
       )}
     >
       {color && (
@@ -63,6 +83,11 @@ export default function ProjectRow({ project, onOpen, selected }) {
       )}
 
       <div className="flex shrink-0 items-center gap-0.5 pl-1">
+        {onToggleCheck && (
+          <span className="mr-1 flex items-center">
+            <SelectBox checked={checked} visible={selectionActive} onToggle={() => onToggleCheck(project)} />
+          </span>
+        )}
         <button
           title={project.pinned ? t('card.unpin') : t('card.pin')}
           aria-label={project.pinned ? t('card.unpin') : t('card.pin')}
@@ -97,6 +122,9 @@ export default function ProjectRow({ project, onOpen, selected }) {
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-semibold text-content-primary">{project.name}</span>
           {project.gitUrl && <Github size={13} className="shrink-0 text-content-faint" />}
+          <span className="min-w-0 shrink">
+            <LinkChip linked={linked} />
+          </span>
         </div>
         {missing ? (
           <p className="flex items-center gap-1 truncate text-xs text-rose-400">
@@ -142,6 +170,14 @@ export default function ProjectRow({ project, onOpen, selected }) {
       </span>
 
       <div className="flex shrink-0 items-center gap-0.5">
+        {isLaunchable(project) ? (
+          <IconBtn title={launchTitle(t, project, linked)} onClick={() => actions.launch(project)}>
+            <Play size={15} className="text-brand" />
+          </IconBtn>
+        ) : (
+          // Keeps the action columns aligned across rows.
+          <span className="h-8 w-8" aria-hidden="true" />
+        )}
         <IconBtn title={t('card.openEditor')} onClick={() => actions.openInEditor(project)}>
           <Code size={16} />
         </IconBtn>

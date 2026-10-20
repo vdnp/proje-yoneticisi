@@ -4,6 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { spawn, execFile } from 'child_process'
 import { loadData, saveData, getDataFilePath } from './store.js'
 import { hydrate } from './schema.js'
+import { launchPlan } from '../shared/links.js'
 import {
   inspectFolder,
   getScripts,
@@ -185,23 +186,24 @@ function showMainWindow() {
 
 // ---- System tray ----------------------------------------------------------
 
-// Launch a project's editor straight from the tray, and let the renderer
-// record the open (lastOpenedAt / openCount) so stats stay accurate.
-function openProjectFromTray(project, settings) {
-  const command = project.editorCommand || settings.defaultEditor || 'code'
-  launchCommand(command, project.path)
+// Launch a project's editor straight from the tray (with its linked projects
+// and dev scripts, when it has any), and let the renderer record the opens
+// (lastOpenedAt / openCount) so stats stay accurate.
+async function openProjectFromTray(project, data) {
+  // Without links or a launch script the plan is just this project's editor.
+  const plan = launchPlan(project, data.projects || [], data.settings?.defaultEditor)
+  const results = await runLaunchPlan(plan)
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('project:opened', project.id)
+    for (const r of results) if (r.ok) mainWindow.webContents.send('project:opened', r.id)
   }
 }
 
 function buildTrayMenu(data) {
   const projects = data.projects || []
-  const settings = data.settings || {}
 
   const toItem = (p) => ({
     label: p.name,
-    click: () => openProjectFromTray(p, settings)
+    click: () => openProjectFromTray(p, data)
   })
 
   const favorites = projects.filter((p) => p.favorite).slice(0, 8)
@@ -322,6 +324,27 @@ function runScript(folderPath, script) {
   return startDetached('cmd.exe', ['/c', 'start', '', 'cmd.exe', '/k', `cd /d "${folderPath}" && ${cmd}`], {})
 }
 
+// Launch: open every project of the plan (see shared/links.js) in its own
+// editor and start its dev script, if it has one. Each step goes through the
+// same checks as the single actions (editor command exists, script is
+// declared in package.json and safe).
+async function runLaunchPlan(plan) {
+  const results = []
+  for (const step of Array.isArray(plan) ? plan : []) {
+    if (!step || typeof step.path !== 'string') continue
+    const opened = await launchCommand(typeof step.command === 'string' ? step.command : '', step.path)
+    const result = { id: step.id, name: step.name, ok: !!opened.ok, error: opened.error || '' }
+    // The dev script still starts when only the editor failed (e.g. not
+    // installed); a missing folder stops both.
+    if (opened.error !== 'not_found' && typeof step.script === 'string' && step.script) {
+      const ran = await runScript(step.path, step.script)
+      if (!ran.ok) result.scriptError = ran.error || 'unknown'
+    }
+    results.push(result)
+  }
+  return results
+}
+
 // ---- IPC registration -----------------------------------------------------
 
 function registerIpc() {
@@ -392,6 +415,7 @@ function registerIpc() {
   ipcMain.handle('project:scanRoot', (_e, rootPath) => scanRoot(rootPath))
   ipcMain.handle('project:scripts', (_e, folderPath) => getScripts(folderPath))
   ipcMain.handle('project:runScript', (_e, { folderPath, script }) => runScript(folderPath, script))
+  ipcMain.handle('project:launch', (_e, plan) => runLaunchPlan(plan))
   ipcMain.handle('project:readme', (_e, folderPath) => getReadme(folderPath))
   ipcMain.handle('fs:checkPaths', (_e, paths) => checkPaths(paths))
 

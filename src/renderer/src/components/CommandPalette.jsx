@@ -5,6 +5,7 @@ import { fuzzyScore, fuzzyScoreAny } from '../lib/fuzzy.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
 import { useI18n } from '../lib/i18n.js'
 import useStore from '../store/useStore.js'
+import { isLaunchable } from '../../../shared/links.js'
 
 function Kbd({ children }) {
   return (
@@ -48,8 +49,15 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
       label: p.name,
       hint: p.path,
       project: p,
-      // Enter → open in editor (the fast path). Ctrl+Enter → open detail page.
+      launchable: isLaunchable(p),
+      // Enter → launch (linked projects, dev script) or just open in the
+      // editor. Shift+Enter → editor only. Ctrl+Enter → detail page.
       run: () => {
+        if (isLaunchable(p)) actions.launch(p)
+        else actions.openInEditor(p)
+        onClose()
+      },
+      runEditor: () => {
         actions.openInEditor(p)
         onClose()
       },
@@ -106,6 +114,7 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
       const item = items[index]
       if (!item) return
       if ((e.ctrlKey || e.metaKey) && item.runAlt) item.runAlt()
+      else if (e.shiftKey && item.runEditor) item.runEditor()
       else item.run()
     } else if (e.key === 'Escape') {
       e.preventDefault()
@@ -163,7 +172,9 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
                     <span className="block truncate text-xs text-content-faint">{item.hint}</span>
                   </span>
                   {item.project && i === index && (
-                    <span className="shrink-0 text-[10px] text-content-faint">{t('palette.openEditor')}</span>
+                    <span className="shrink-0 text-[10px] text-content-faint">
+                      {item.launchable ? t('palette.launch') : t('palette.openEditor')}
+                    </span>
                   )}
                 </button>
               )
@@ -177,8 +188,14 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
             <Kbd>↓</Kbd> {t('palette.navigate')}
           </span>
           <span className="flex items-center gap-1">
-            <Kbd>⏎</Kbd> {t('palette.openEditor')}
+            <Kbd>⏎</Kbd> {items[index]?.launchable ? t('palette.launch') : t('palette.openEditor')}
           </span>
+          {items[index]?.launchable && (
+            <span className="flex items-center gap-1">
+              <Kbd>Shift</Kbd>
+              <Kbd>⏎</Kbd> {t('palette.editorOnly')}
+            </span>
+          )}
           <span className="flex items-center gap-1">
             <Kbd>Ctrl</Kbd>
             <Kbd>⏎</Kbd> {t('palette.details')}

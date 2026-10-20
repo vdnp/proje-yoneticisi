@@ -24,7 +24,9 @@ Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevler
 - **Hızlı aksiyonlar**: Editörde (proje bazında seçilebilir: VS Code, VS Code Insiders, Cursor ya da herhangi bir komut), terminalde, Dosya Gezgini'nde ya da GitHub'da aç.
 - **Proje sayfası**: Notlar, yapılacaklar listesi, işlenmiş README ve tek tıkla çalışan `package.json` script'leri.
 - **Tüm Görevler**: Bütün projelerin görevleri tek listede.
-- **Düzen**: Favoriler, sabitleme, renk kodlu gruplar (kartları gruba sürükle), etiketler ve sıralama.
+- **Bağlı projeler**: Bir frontend'i backend'ine bağla; klasörlerin diskte nerede olduğu fark etmez. **Başlat** ikisini birlikte, her birini kendi editöründe açar ve dev script'lerini ayrı terminallerde çalıştırır.
+- **Düzen**: Favoriler, sabitleme, renk kodlu gruplar (kartları gruba sürükle), etiketler, sıralama ve kartları sürükleyerek belirlediğin özel sıra.
+- **Toplu işlemler**: <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+tıklama ile birden çok proje seç; hepsini birden favorile, sabitle, etiketle, gruba taşı, birbirine bağla ya da listeden kaldır.
 - **Tepsi menüsü**: Favori ve son açılan projeler; pencereyi açmadan projeyi aç.
 - **Bakım**: Taşınan ya da silinen proje klasörlerini fark eder, etiketleri yeniden algılar, yedeği dışa/içe aktarır.
 - **Türkçe ve İngilizce** arayüz, karanlık ve aydınlık tema, sekiz vurgu rengi.
@@ -51,11 +53,13 @@ Kurulum dosyasıyla yüklediysen güncellemek için yeni sürümü eskisinin üz
 | Kısayol | Ne yapar |
 | --- | --- |
 | <kbd>Ctrl</kbd>+<kbd>K</kbd> | Komut paleti |
-| <kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (palette) | Editörde aç / proje sayfasını aç |
+| <kbd>Enter</kbd> (palette) | Projeyi başlat (bağlı projeler ve dev script'iyle) ya da editörde aç |
+| <kbd>Shift</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (palette) | Yalnızca editörde aç / proje sayfasını aç |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Uygulamayı paletle birlikte öne getirir (tepsiden de çalışır; değiştirilebilir) |
 | <kbd>Ctrl</kbd>+<kbd>N</kbd> | Proje ekle |
 | <kbd>Ctrl</kbd>+<kbd>F</kbd> | Ara |
 | Ok tuşları, <kbd>Enter</kbd> | Kartlar arasında gez, aç |
+| <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+tıklama, <kbd>Ctrl</kbd>+<kbd>A</kbd> | Proje seç / tümünü seç (<kbd>Esc</kbd> seçimi temizler) |
 | <kbd>Esc</kbd> | Geri / kapat |
 
 ## Verilerin
