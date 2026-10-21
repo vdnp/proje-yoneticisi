@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.1
 
 ### Added
 - **Styles.** Settings → Appearance → Style offers four looks: Classic (the original), Minimal (Linear/Raycast-like: hairlines, tight corners, no shadows), Glass (Fluent/macOS-like: translucent surfaces over a soft accent-tinted backdrop) and Soft (Notion/Arc-like: roomy cards tinted with the project's color, pill chips). Each works with the dark and light themes and every accent color.
