@@ -101,8 +101,6 @@ export default {
     link: 'Link together',
     linked: 'Projects linked.',
     remove: 'Remove from list',
-    confirmRemove_one: 'Remove {count} project from the list?\n(The folder stays on disk.)',
-    confirmRemove_other: 'Remove {count} projects from the list?\n(The folders stay on disk.)',
     clear: 'Clear selection'
   },
   git: {
@@ -128,7 +126,6 @@ export default {
   detail: {
     notFound: 'Project not found.',
     removeFromList: 'Remove from list',
-    confirmRemove: 'Remove "{name}" from the list?\n(The folder stays on disk.)',
     descriptionPlaceholder: 'Description',
     remotePlaceholder: 'GitHub / remote URL',
     tagsPlaceholder: 'Tags (comma separated)',
@@ -250,6 +247,13 @@ export default {
     merged_other: 'Added {count} projects.',
     replaced: 'Backup restored.'
   },
+  undo: {
+    projectRemoved: 'Project removed',
+    projectsRemoved_one: '{count} project removed',
+    projectsRemoved_other: '{count} projects removed',
+    todoRemoved: 'Task deleted',
+    action: 'Undo'
+  },
   palette: {
     placeholder: 'Search projects or type a command…',
     noResults: 'No results.',
@@ -316,6 +320,10 @@ export default {
     exported: 'Saved: {path}',
     import: 'Import',
     importDesc: 'Restores from a backup file.',
+    snapshots: 'Daily backups',
+    snapshotsDesc: 'Made automatically, one per day for the last 7 days. Restoring one lets you merge or replace, like an import.',
+    snapshotsNone: 'No daily backups yet. The first one is made the next time something changes.',
+    snapshotRestore: 'Restore',
     updates: 'Updates',
     updatesStore: 'The Microsoft Store version is updated automatically by the Store.',
     updateNever: 'Not checked yet',
@@ -333,7 +341,7 @@ export default {
     aboutDesc: 'Your data lives outside the install folder, so updating or uninstalling never touches it.',
     version: 'Version',
     dataFile: 'Data file',
-    backupNote: 'A .bak copy is kept in the same folder before every save.'
+    backupNote: 'A .bak copy is kept in the same folder before every save, plus daily copies of the last 7 days in its backups folder.'
   },
   actions: {
     noPath: "This project doesn't have a folder path.",

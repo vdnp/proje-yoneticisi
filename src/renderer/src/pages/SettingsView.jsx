@@ -12,7 +12,7 @@ import {
   Upload,
   AlertTriangle
 } from '../components/Icons.jsx'
-import { cn, newId, relativeTime } from '../lib/utils.js'
+import { cn, newId, relativeTime, formatDate } from '../lib/utils.js'
 import { ACCENT_LIST } from '../lib/theme.js'
 import { LANGUAGES, useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
@@ -97,9 +97,11 @@ export default function SettingsView({ onOpenProject }) {
   const [maintenanceMsg, setMaintenanceMsg] = useState('')
   const [backupMsg, setBackupMsg] = useState('')
   const [pendingImport, setPendingImport] = useState(null)
+  const [snapshots, setSnapshots] = useState([])
 
   useEffect(() => {
     api.getDataPath().then(setDataPath)
+    api.listBackups().then(setSnapshots)
     api.getAppInfo().then((info) => {
       setVersion(info.version)
       setIsStore(info.store)
@@ -179,6 +181,19 @@ export default function SettingsView({ onOpenProject }) {
     const res = await api.importData()
     if (res?.ok) setPendingImport(res.data)
     else if (!res?.canceled) setBackupMsg(errorText(t, res?.error))
+  }
+
+  const restoreSnapshot = async (name) => {
+    setBackupMsg('')
+    const res = await api.readBackup(name)
+    if (res?.ok) setPendingImport(res.data)
+    else setBackupMsg(errorText(t, res?.error))
+  }
+
+  // "2026-10-21" -> local midnight, so the shown day never shifts by timezone.
+  const snapshotDay = (date) => {
+    const [y, m, d] = date.split('-').map(Number)
+    return formatDate(new Date(y, m - 1, d).getTime(), lang)
   }
 
   // After "replace everything", OS-level settings must follow the new data.
@@ -477,6 +492,32 @@ export default function SettingsView({ onOpenProject }) {
                 <Upload size={15} /> {t('settings.import')}
               </button>
             </Row>
+            <Row title={t('settings.snapshots')} desc={t('settings.snapshotsDesc')} />
+            {snapshots.length === 0 ? (
+              <p className="mt-2 text-xs text-content-faint">{t('settings.snapshotsNone')}</p>
+            ) : (
+              <div className="mt-2 flex flex-col gap-1.5">
+                {snapshots.map((s) => (
+                  <div
+                    key={s.name}
+                    className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-bg px-3 py-2"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-content-primary">
+                      {snapshotDay(s.date)}
+                    </span>
+                    <span className="shrink-0 text-xs text-content-faint">
+                      {t('nav.projectCount', { count: s.projects })}
+                    </span>
+                    <button
+                      onClick={() => restoreSnapshot(s.name)}
+                      className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand transition hover:bg-brand/10"
+                    >
+                      {t('settings.snapshotRestore')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             {backupMsg && (
               <p className="mt-3 break-all text-xs text-content-secondary" role="status">
                 {backupMsg}

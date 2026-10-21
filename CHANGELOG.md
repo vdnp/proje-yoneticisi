@@ -4,6 +4,11 @@
 
 ### Added
 - **Update check** in Settings → Updates: shows whether a newer version is on GitHub, with a link to download it, and a small dot on Settings in the sidebar when there is one. Checks only when you click **Check now**, or once a day if you turn on **Check automatically** (off by default). The Microsoft Store version is updated by the Store and doesn't check.
+- **Daily backups.** Besides the `.bak` copy, a copy of your data is kept for each of the last 7 days in a `backups` folder next to `data.json`. Settings → Backup lists them (date and project count) and restores any of them with the same merge / replace choice as an import.
+- **Undo.** Removing a project (from its page, Settings or the selection bar) or deleting a to-do shows a short "Undo" message at the bottom of the window. Undo brings back exactly what was removed, including its links to other projects.
+
+### Changed
+- Removing projects no longer asks for confirmation first; use Undo instead.
 
 ## 1.4.0
 

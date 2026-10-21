@@ -29,6 +29,10 @@ const useStore = create((set, get) => ({
   // Result of the last update check ({ ok, latest, newer, url, error,
   // checkedAt }) or null. Never persisted.
   update: null,
+  // The last removal, for the undo toast: { kind: 'projects', items:
+  // [{ project, index }] } or { kind: 'todo', projectId, todo, index }.
+  // Only the newest one can be undone. Never persisted.
+  lastRemoved: null,
 
   // ---- lifecycle ----
   init: async () => {
@@ -68,7 +72,8 @@ const useStore = create((set, get) => ({
       projects: data.projects || [],
       groups: data.groups || [],
       settings: data.settings || {},
-      version: data.version || get().version
+      version: data.version || get().version,
+      lastRemoved: null
     })
     applyTheme(get().settings)
     schedulePersist(get)
@@ -185,9 +190,17 @@ const useStore = create((set, get) => ({
 
   removeProject: (id) => get().removeProjects([id]),
 
+  // The removed projects are kept as they were, links included, so undo()
+  // can put them back in place and relink the other side.
   removeProjects: (ids) => {
     const gone = new Set(ids)
-    set((s) => ({ projects: sanitizeLinks(s.projects.filter((p) => !gone.has(p.id))) }))
+    const { projects } = get()
+    const items = projects.flatMap((project, index) => (gone.has(project.id) ? [{ project, index }] : []))
+    if (!items.length) return
+    set({
+      projects: sanitizeLinks(projects.filter((p) => !gone.has(p.id))),
+      lastRemoved: { kind: 'projects', items }
+    })
     schedulePersist(get)
   },
 
@@ -298,12 +311,16 @@ const useStore = create((set, get) => ({
   },
 
   removeTodo: (projectId, todoId) => {
+    const todos = get().projects.find((p) => p.id === projectId)?.todos || []
+    const index = todos.findIndex((t) => t.id === todoId)
+    if (index < 0) return
     set((s) => ({
       projects: s.projects.map((p) =>
         p.id === projectId
           ? { ...p, todos: p.todos.filter((t) => t.id !== todoId) }
           : p
-      )
+      ),
+      lastRemoved: { kind: 'todo', projectId, todo: todos[index], index }
     }))
     schedulePersist(get)
   },
@@ -321,6 +338,44 @@ const useStore = create((set, get) => ({
       })
     }))
     schedulePersist(get)
+  },
+
+  // ---- undo ----
+  // Puts back exactly what the last removal took, at its old position.
+  // Anything that came back another way meanwhile (same id, or a project
+  // re-added from the same folder) is not duplicated.
+  undo: () => {
+    const r = get().lastRemoved
+    if (!r) return
+    if (r.kind === 'projects') {
+      const projects = [...get().projects]
+      const groupIds = new Set(get().groups.map((g) => g.id))
+      // Ascending indexes, so each insert lands where it was before.
+      for (const { project, index } of r.items) {
+        if (projects.some((p) => p.id === project.id || (project.path && samePath(p.path, project.path)))) continue
+        const groupId = groupIds.has(project.groupId) ? project.groupId : null
+        projects.splice(Math.min(index, projects.length), 0, { ...project, groupId })
+      }
+      // The restored projects still list their links; sanitizeLinks adds
+      // them back on the other side.
+      set({ projects: sanitizeLinks(projects), lastRemoved: null })
+    } else {
+      set((s) => ({
+        projects: s.projects.map((p) => {
+          const todos = p.todos || []
+          if (p.id !== r.projectId || todos.some((t) => t.id === r.todo.id)) return p
+          return { ...p, todos: [...todos.slice(0, r.index), r.todo, ...todos.slice(r.index)] }
+        }),
+        lastRemoved: null
+      }))
+    }
+    schedulePersist(get)
+  },
+
+  // The toast timed out: the removal is final. Ignored if a newer removal
+  // has taken its place.
+  dismissUndo: (removed) => {
+    if (get().lastRemoved === removed) set({ lastRemoved: null })
   }
 }))
 

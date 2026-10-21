@@ -98,7 +98,6 @@ export default {
     link: 'Birbirine bağla',
     linked: 'Projeler birbirine bağlandı.',
     remove: 'Listeden kaldır',
-    confirmRemove: '{count} proje listeden kaldırılsın mı?\n(Klasörler diskten silinmez.)',
     clear: 'Seçimi temizle'
   },
   git: {
@@ -120,7 +119,6 @@ export default {
   detail: {
     notFound: 'Proje bulunamadı.',
     removeFromList: 'Listeden kaldır',
-    confirmRemove: '"{name}" listeden kaldırılsın mı?\n(Klasör diskten silinmez.)',
     descriptionPlaceholder: 'Açıklama',
     remotePlaceholder: 'GitHub / uzak depo URL',
     tagsPlaceholder: 'Etiketler (virgülle ayır)',
@@ -239,6 +237,12 @@ export default {
     merged: '{count} proje eklendi.',
     replaced: 'Yedek geri yüklendi.'
   },
+  undo: {
+    projectRemoved: 'Proje listeden kaldırıldı',
+    projectsRemoved: '{count} proje listeden kaldırıldı',
+    todoRemoved: 'Görev silindi',
+    action: 'Geri al'
+  },
   palette: {
     placeholder: 'Proje ara ya da komut yaz…',
     noResults: 'Sonuç yok.',
@@ -303,6 +307,10 @@ export default {
     exported: 'Kaydedildi: {path}',
     import: 'İçe aktar',
     importDesc: 'Bir yedek dosyasını geri yükler.',
+    snapshots: 'Günlük yedekler',
+    snapshotsDesc: 'Son 7 gün için her gün otomatik alınır. Geri yüklerken içe aktarmadaki gibi birleştirebilir ya da tümünü değiştirebilirsin.',
+    snapshotsNone: 'Henüz günlük yedek yok. İlki bir sonraki değişiklikte alınır.',
+    snapshotRestore: 'Geri yükle',
     updates: 'Güncellemeler',
     updatesStore: 'Microsoft Store sürümü Store üzerinden kendiliğinden güncellenir.',
     updateNever: 'Henüz denetlenmedi',
@@ -320,7 +328,7 @@ export default {
     aboutDesc: 'Veriler kurulum klasörünün dışında tutulur; güncelleme ya da kaldırma bunlara dokunmaz.',
     version: 'Sürüm',
     dataFile: 'Veri dosyası',
-    backupNote: 'Her kayıttan önce aynı klasörde bir .bak yedeği tutulur.'
+    backupNote: 'Her kayıttan önce aynı klasörde bir .bak yedeği, backups klasöründe de son 7 günün günlük yedekleri tutulur.'
   },
   actions: {
     noPath: 'Bu projenin klasör yolu tanımlı değil.',

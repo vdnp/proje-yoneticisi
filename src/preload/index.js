@@ -13,6 +13,8 @@ const api = {
   openStartupSettings: () => ipcRenderer.invoke('open:startupSettings'),
   exportData: (data) => ipcRenderer.invoke('data:export', data),
   importData: () => ipcRenderer.invoke('data:import'),
+  listBackups: () => ipcRenderer.invoke('backups:list'),
+  readBackup: (name) => ipcRenderer.invoke('backups:read', name),
 
   selectFolder: (defaultPath) => ipcRenderer.invoke('dialog:selectFolder', defaultPath),
   inspectFolder: (folderPath) => ipcRenderer.invoke('project:inspect', folderPath),

@@ -70,7 +70,7 @@ Everything stays on your computer, in a single JSON file:
 %APPDATA%\project-manager\data.json
 ```
 
-A `.bak` copy of the previous version is written before every save, and the app recovers from it if the file is ever damaged. **Settings → Backup** exports and imports the whole thing.
+A `.bak` copy of the previous version is written before every save, and the app recovers from it if the file is ever damaged. The app also keeps a daily copy of the last 7 days in the `backups` folder next to it; **Settings → Backup** lists them and restores any of them, and exports and imports the whole thing.
 
 The app makes no network requests of its own. The only things that reach the internet are links you open in your browser and `https` images embedded in a project's README.
 
