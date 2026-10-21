@@ -93,7 +93,7 @@ export function hydrate(parsed) {
   // and their defaultEditor is the previous default, 'code'.
   if ((parsed.version || 1) < 3) {
     const s = data.settings
-    if (!arr(s.editors).some((e) => e.command === 'code-insiders')) {
+    if (!arr(s.editors).some((e) => e && e.command === 'code-insiders')) {
       s.editors = [
         { id: 'code-insiders', label: 'VS Code Insiders', command: 'code-insiders' },
         ...arr(s.editors)

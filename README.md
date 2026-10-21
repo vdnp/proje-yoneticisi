@@ -82,6 +82,7 @@ Requirements: Node.js 22+ and npm, on Windows.
 npm install
 npm run dev         # the Electron app with hot reload
 npm run dev:web     # the UI alone in a browser, on fictional sample data
+npm test            # unit tests (Vitest), in tests/
 npm run build       # installer in release/
 npm run build:store # Microsoft Store (MSIX) package in release/
 ```

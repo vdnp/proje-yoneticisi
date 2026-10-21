@@ -34,7 +34,11 @@ export async function getGitStatus(folderPath) {
   if (!isRepo(folderPath)) return null
   const out = await git(folderPath, ['status', '--porcelain=v2', '--branch'])
   if (out === null) return null
+  return parseGitStatus(out)
+}
 
+// The output of `git status --porcelain=v2 --branch` -> status object.
+export function parseGitStatus(out) {
   const status = {
     branch: '',
     detached: false,

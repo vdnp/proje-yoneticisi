@@ -10,6 +10,13 @@
 
 - **Update check** in Settings → Updates: shows whether a newer version is on GitHub, with a link to download it, and a small dot on Settings in the sidebar when there is one. Checks only when you click **Check now**, or once a day if you turn on **Check automatically** (off by default). The Microsoft Store version is updated by the Store and doesn't check.
 
+### Fixed
+- Search (the command palette, the project list and the task list) now finds names with a capital I when you type a lowercase i, and the other way round: "ai" finds "AI Chat", "API" finds "api".
+- An older data file with an empty entry in its editors list no longer fails to load.
+
+### Development
+- Unit tests (Vitest) for the data file schema and its migrations, linked projects, sorting, project detection, git status parsing, search and translations; `npm test` runs them, and CI runs them on every push.
+
 ## 1.4.0
 
 ### Added

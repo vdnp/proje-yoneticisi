@@ -4,8 +4,10 @@
 // Scoring favours: consecutive runs, matches at word boundaries, matches at the
 // start, and shorter targets. Returns -1 when there is no match.
 
+// Turkish lower-casing keeps 'İ' a single 'i', but it also turns 'I' into a
+// dotless 'ı', so fold that back: "API" must still find "api".
 function normalize(s) {
-  return (s || '').toLocaleLowerCase('tr')
+  return (s || '').toLocaleLowerCase('tr').replace(/ı/g, 'i')
 }
 
 export function fuzzyScore(query, text) {
