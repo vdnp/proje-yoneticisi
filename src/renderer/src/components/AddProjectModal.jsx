@@ -6,6 +6,7 @@ import { samePath } from '../lib/utils.js'
 import { useI18n } from '../lib/i18n.js'
 import api from '../lib/api.js'
 import useStore from '../store/useStore.js'
+import { showAlert } from '../lib/dialogs.js'
 
 const inputCls =
   'w-full rounded-xl border border-surface-border bg-surface-bg px-3 py-2 text-sm text-content-primary placeholder:text-content-faint focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/20'
@@ -63,8 +64,8 @@ export default function AddProjectModal({ onClose, onCreated }) {
   }
 
   const save = () => {
-    if (!form.path) return alert(t('addModal.chooseFirst'))
-    if (projects.some((p) => samePath(p.path, form.path))) return alert(t('addModal.alreadyAdded'))
+    if (!form.path) return showAlert(t('addModal.chooseFirst'))
+    if (projects.some((p) => samePath(p.path, form.path))) return showAlert(t('addModal.alreadyAdded'))
     const tags = form.tags
       .split(',')
       .map((tag) => tag.trim())

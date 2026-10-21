@@ -5,6 +5,7 @@ import { cn } from '../lib/utils.js'
 import { GROUP_COLOR_LIST } from '../lib/groups.js'
 import { useI18n } from '../lib/i18n.js'
 import useStore from '../store/useStore.js'
+import { showConfirm } from '../lib/dialogs.js'
 
 const inputCls =
   'w-full rounded-xl border border-surface-border bg-surface-bg px-3 py-2 text-sm text-content-primary placeholder:text-content-faint focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/20'
@@ -26,8 +27,12 @@ export default function GroupModal({ group, onClose }) {
     onClose()
   }
 
-  const destroy = () => {
-    if (confirm(t('groupModal.confirmDelete', { name: group.name }))) {
+  const destroy = async () => {
+    const ok = await showConfirm(t('groupModal.confirmDelete', { name: group.name }), {
+      danger: true,
+      confirmLabel: t('common.delete')
+    })
+    if (ok) {
       removeGroup(group.id)
       onClose()
     }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ImportModal from '../components/ImportModal.jsx'
+import Select from '../components/Select.jsx'
 import {
   Sun,
   Moon,
@@ -417,17 +418,13 @@ export default function SettingsView({ onOpenProject }) {
               <label className="mb-1 block text-xs font-medium text-content-secondary">
                 {t('settings.defaultEditor')}
               </label>
-              <select
+              <Select
+                block
                 value={settings.defaultEditor || ''}
-                onChange={(e) => updateSettings({ defaultEditor: e.target.value })}
-                className="w-full rounded-xl border border-surface-border bg-surface-bg px-3 py-2 text-sm text-content-primary focus:outline-none"
-              >
-                {editors.map((ed) => (
-                  <option key={ed.id} value={ed.command}>
-                    {ed.label} ({ed.command})
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => updateSettings({ defaultEditor: v })}
+                label={t('settings.defaultEditor')}
+                options={editors.map((ed) => ({ value: ed.command, label: ed.label, hint: ed.command }))}
+              />
             </div>
 
             <div className="flex flex-col gap-2">

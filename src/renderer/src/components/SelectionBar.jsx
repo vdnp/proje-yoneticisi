@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Star, Pin, Tag, Link, Trash, X, Layers } from './Icons.jsx'
 import { cn } from '../lib/utils.js'
 import { useI18n } from '../lib/i18n.js'
+import { groupColorHex } from '../lib/groups.js'
+import Select from './Select.jsx'
 import useStore from '../store/useStore.js'
 
 function BarButton({ icon: Icon, label, onClick, tone = 'default', disabled }) {
@@ -75,27 +77,22 @@ export default function SelectionBar({ ids, onClear }) {
         onClick={() => updateProjects(ids, { pinned: !allPinned })}
       />
 
-      <label className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-content-secondary">
-        <Layers size={14} />
-        <select
-          value=""
-          onChange={(e) => {
-            if (e.target.value === '') return
-            updateProjects(ids, { groupId: e.target.value === '-' ? null : e.target.value })
-            flash(t('selection.moved'))
-          }}
-          aria-label={t('selection.moveToGroup')}
-          className="rounded-md border border-surface-border bg-surface-bg px-1.5 py-1 text-xs text-content-primary focus:outline-none"
-        >
-          <option value="">{t('selection.moveToGroup')}</option>
-          {groups.map((g) => (
-            <option key={g.id} value={g.id}>
-              {g.name}
-            </option>
-          ))}
-          <option value="-">{t('detail.noGroup')}</option>
-        </select>
-      </label>
+      <Select
+        size="xs"
+        value=""
+        icon={Layers}
+        placeholder={t('selection.moveToGroup')}
+        label={t('selection.moveToGroup')}
+        onChange={(v) => {
+          updateProjects(ids, { groupId: v === '-' ? null : v })
+          flash(t('selection.moved'))
+        }}
+        options={[
+          ...groups.map((g) => ({ value: g.id, label: g.name, dot: groupColorHex(g.color) })),
+          { value: '-', label: t('detail.noGroup') }
+        ]}
+        className="mx-1"
+      />
 
       {tagging ? (
         <form

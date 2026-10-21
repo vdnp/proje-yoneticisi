@@ -3,6 +3,7 @@ import TodoList from '../components/TodoList.jsx'
 import TagBadge from '../components/TagBadge.jsx'
 import PackageManagerBadge from '../components/PackageManagerBadge.jsx'
 import ReadmeCard from '../components/ReadmeCard.jsx'
+import Select from '../components/Select.jsx'
 import {
   ArrowLeft,
   Star,
@@ -24,12 +25,13 @@ import {
 } from '../components/Icons.jsx'
 import { isLaunchable, linkedProjects } from '../../../shared/links.js'
 import { cn, relativeTime, formatDate, samePath } from '../lib/utils.js'
-import { GROUP_COLOR_LIST } from '../lib/groups.js'
+import { GROUP_COLOR_LIST, groupColorHex } from '../lib/groups.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
 import { useGitStatus } from '../lib/useGitStatus.js'
 import { useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
 import useStore from '../store/useStore.js'
+import { showAlert } from '../lib/dialogs.js'
 
 const inputCls =
   'w-full rounded-xl border border-surface-border bg-surface-bg px-3 py-2 text-sm text-content-primary placeholder:text-content-faint focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/20'
@@ -208,45 +210,39 @@ function LinksCard({ project, scripts, onOpenProject }) {
 
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
         {candidates.length > 0 && (
-          <select
+          <Select
+            size="sm"
             value=""
-            onChange={(e) => e.target.value && linkProjects([project.id, e.target.value])}
-            aria-label={t('detail.addLink')}
-            className="rounded-lg border border-surface-border bg-surface-bg px-2.5 py-1.5 text-sm text-content-primary focus:outline-none"
-          >
-            <option value="">{t('detail.addLink')}</option>
-            {candidates.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+            onChange={(id) => linkProjects([project.id, id])}
+            placeholder={t('detail.addLink')}
+            label={t('detail.addLink')}
+            icon={Link}
+            menuWidth={240}
+            options={candidates.map((p) => ({ value: p.id, label: p.name }))}
+          />
         )}
 
-        <label className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-content-secondary">{t('detail.startScript')}:</span>
           {scriptNames.length || project.startScript ? (
-            <select
+            <Select
+              size="sm"
               value={project.startScript || ''}
-              onChange={(e) => updateProject(project.id, { startScript: e.target.value })}
-              className="rounded-lg border border-surface-border bg-surface-bg px-2.5 py-1.5 text-sm text-content-primary focus:outline-none"
-            >
-              <option value="">{t('detail.startScriptNone')}</option>
-              {scriptNames.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-              {missingStart && (
-                <option value={project.startScript}>
-                  {t('detail.startScriptMissing', { script: project.startScript })}
-                </option>
-              )}
-            </select>
+              onChange={(v) => updateProject(project.id, { startScript: v })}
+              label={t('detail.startScript')}
+              menuWidth={240}
+              options={[
+                { value: '', label: t('detail.startScriptNone') },
+                ...scriptNames.map((name) => ({ value: name, label: name, hint: scripts[name] })),
+                ...(missingStart
+                  ? [{ value: project.startScript, label: t('detail.startScriptMissing', { script: project.startScript }) }]
+                  : [])
+              ]}
+            />
           ) : (
             <span className="text-xs text-content-faint">{t('detail.noScriptsForStart')}</span>
           )}
-        </label>
+        </div>
       </div>
     </div>
   )
@@ -306,7 +302,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
       setRanScript(name)
       setTimeout(() => setRanScript(''), 2500)
     } else {
-      alert(`${t('detail.scriptFailed')}\n${errorText(t, res?.error)}`)
+      showAlert(`${t('detail.scriptFailed')}\n${errorText(t, res?.error)}`)
     }
   }
 
@@ -318,7 +314,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
 
   const redetectTags = async () => {
     const res = await api.redetect(project.path, project.tags)
-    if (!res?.ok) return alert(errorText(t, res?.error))
+    if (!res?.ok) return showAlert(errorText(t, res?.error))
     updateProject(project.id, res.data)
     flash(t('detail.redetected'))
   }
@@ -329,7 +325,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
     const res = await api.selectFolder(settings.defaultRoot || '')
     if (!res.ok) return
     if (projects.some((p) => p.id !== project.id && samePath(p.path, res.path))) {
-      return alert(t('addModal.alreadyAdded'))
+      return showAlert(t('addModal.alreadyAdded'))
     }
     const [detected, inspected] = await Promise.all([
       api.redetect(res.path, project.tags),
@@ -534,37 +530,34 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
 
         {/* per-project editor + group + color */}
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
-          <label className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <span className="text-content-secondary">{t('detail.editor')}:</span>
-            <select
+            <Select
+              size="sm"
               value={project.editorCommand || ''}
-              onChange={(e) => updateProject(project.id, { editorCommand: e.target.value })}
-              className="rounded-lg border border-surface-border bg-surface-card px-2.5 py-1.5 text-sm text-content-primary focus:outline-none"
-            >
-              <option value="">{t('detail.defaultEditor', { name: settings.defaultEditor })}</option>
-              {editors.map((ed) => (
-                <option key={ed.id} value={ed.command}>
-                  {ed.label} ({ed.command})
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={(v) => updateProject(project.id, { editorCommand: v })}
+              label={t('detail.editor')}
+              menuWidth={260}
+              options={[
+                { value: '', label: t('detail.defaultEditor', { name: settings.defaultEditor }) },
+                ...editors.map((ed) => ({ value: ed.command, label: ed.label, hint: ed.command }))
+              ]}
+            />
+          </div>
 
-          <label className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <span className="text-content-secondary">{t('detail.group')}:</span>
-            <select
+            <Select
+              size="sm"
               value={project.groupId || ''}
-              onChange={(e) => setProjectGroup(project.id, e.target.value || null)}
-              className="rounded-lg border border-surface-border bg-surface-card px-2.5 py-1.5 text-sm text-content-primary focus:outline-none"
-            >
-              <option value="">{t('detail.noGroup')}</option>
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={(v) => setProjectGroup(project.id, v || null)}
+              label={t('detail.group')}
+              options={[
+                { value: '', label: t('detail.noGroup') },
+                ...groups.map((g) => ({ value: g.id, label: g.name, dot: groupColorHex(g.color) }))
+              ]}
+            />
+          </div>
 
           <div className="flex items-center gap-2">
             <span className="text-content-secondary">{t('detail.color')}:</span>

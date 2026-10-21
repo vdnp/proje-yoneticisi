@@ -170,6 +170,7 @@ export const Dots = make(
     <circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none" />
   </>
 )
+export const ArrowUpDown = make(<path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3" />)
 export const Link = make(
   <>
     <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07L11.5 4.4" />

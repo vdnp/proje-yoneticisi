@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ProjectCard from '../components/ProjectCard.jsx'
 import ProjectRow from '../components/ProjectRow.jsx'
 import SelectionBar from '../components/SelectionBar.jsx'
-import { Search, Grid, List, Clock, Plus, Scan, Pin, Folder } from '../components/Icons.jsx'
+import Select from '../components/Select.jsx'
+import { Search, Grid, List, Clock, Plus, Scan, Pin, Folder, ArrowUpDown } from '../components/Icons.jsx'
 import { cn } from '../lib/utils.js'
 import { fuzzyScoreAny } from '../lib/fuzzy.js'
 import { SORTS, sortProjects, customOrderIds, moveIds } from '../lib/sort.js'
@@ -124,8 +125,8 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
   useEffect(() => {
     if (!keyboardActive) return
     const onKey = (e) => {
-      // Text fields keep their own Ctrl+A / Esc; a focused <select> (e.g.
-      // right after picking a sort) shouldn't swallow them.
+      // Text fields keep their own Ctrl+A / Esc; a focused dropdown button
+      // (e.g. right after picking a sort) shouldn't swallow them.
       const tag = document.activeElement?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA') return
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
@@ -289,17 +290,14 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
           <Scan size={16} /> {t('home.scan')}
         </button>
 
-        <select
+        <Select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="rounded-xl border border-surface-border bg-surface-card px-3 py-2 text-sm text-content-secondary focus:border-brand/50 focus:outline-none"
-        >
-          {SORTS.map((id) => (
-            <option key={id} value={id}>
-              {t(`home.sort.${id}`)}
-            </option>
-          ))}
-        </select>
+          onChange={setSort}
+          icon={ArrowUpDown}
+          label={t('home.sortLabel')}
+          options={SORTS.map((id) => ({ value: id, label: t(`home.sort.${id}`) }))}
+          className="w-48"
+        />
 
         <div className="flex items-center rounded-xl border border-surface-border bg-surface-card p-0.5">
           {[

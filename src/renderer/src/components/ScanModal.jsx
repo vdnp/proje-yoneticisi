@@ -7,6 +7,7 @@ import { cn, samePath } from '../lib/utils.js'
 import { useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
 import useStore from '../store/useStore.js'
+import { showAlert } from '../lib/dialogs.js'
 
 export default function ScanModal({ onClose, onImported }) {
   const projects = useStore((s) => s.projects)
@@ -35,7 +36,7 @@ export default function ScanModal({ onClose, onImported }) {
     try {
       const res = await api.scanRoot(root)
       if (!res.ok) {
-        alert(res.error ? errorText(t, res.error) : t('scan.failed'))
+        showAlert(res.error ? errorText(t, res.error) : t('scan.failed'))
         return
       }
       const list = res.projects || []

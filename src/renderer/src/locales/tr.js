@@ -7,6 +7,7 @@ export default {
   },
   common: {
     cancel: 'İptal',
+    ok: 'Tamam',
     save: 'Kaydet',
     add: 'Ekle',
     delete: 'Sil',
@@ -43,6 +44,7 @@ export default {
     searchPlaceholder: 'İsim veya etikette ara…',
     scan: 'Tara',
     scanTitle: 'Kök klasörü tara',
+    sortLabel: 'Sıralama',
     sort: {
       custom: 'Özel sıra',
       modified: 'Son düzenlenme',

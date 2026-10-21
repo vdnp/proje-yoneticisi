@@ -6,6 +6,7 @@ export default {
   },
   common: {
     cancel: 'Cancel',
+    ok: 'OK',
     save: 'Save',
     add: 'Add',
     delete: 'Delete',
@@ -44,6 +45,7 @@ export default {
     searchPlaceholder: 'Search by name or tag…',
     scan: 'Scan',
     scanTitle: 'Scan a root folder',
+    sortLabel: 'Sort by',
     sort: {
       custom: 'Custom order',
       modified: 'Last modified',

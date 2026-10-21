@@ -1,6 +1,7 @@
 import api from './api.js'
 import { useI18n, errorText } from './i18n.js'
 import useStore from '../store/useStore.js'
+import { showAlert } from './dialogs.js'
 import { launchPlan } from '../../../shared/links.js'
 
 // Centralizes the "quick actions". Each successful open bumps the project's
@@ -19,15 +20,15 @@ export function useProjectActions() {
   const reportFailure = (project, res, fallback) => {
     if (res?.error === 'not_found') {
       checkMissing()
-      alert(t('actions.missing', { path: project.path }))
+      showAlert(t('actions.missing', { path: project.path }))
     } else {
-      alert(fallback)
+      showAlert(fallback)
     }
   }
 
   const needsPath = (project) => {
     if (project.path) return true
-    alert(t('actions.noPath'))
+    showAlert(t('actions.noPath'))
     return false
   }
 
@@ -37,7 +38,7 @@ export function useProjectActions() {
       const command = resolveEditorCommand(project)
       const res = await api.openInEditor(command, project.path)
       if (res?.ok) return markOpened(project.id)
-      if (res?.error === 'command_not_found') return alert(t('actions.commandNotFound', { command }))
+      if (res?.error === 'command_not_found') return showAlert(t('actions.commandNotFound', { command }))
       reportFailure(project, res, t('actions.editorFailed', { command }))
     },
     openInTerminal: async (project) => {
@@ -56,7 +57,7 @@ export function useProjectActions() {
     // start their dev scripts. One summary alert lists whatever failed.
     launch: async (project) => {
       const plan = launchPlan(project, useStore.getState().projects, settings.defaultEditor)
-      if (!plan.length) return alert(t('actions.noPath'))
+      if (!plan.length) return showAlert(t('actions.noPath'))
       const results = (await api.launch(plan)) || []
       const problems = []
       for (const r of results) {
@@ -71,10 +72,10 @@ export function useProjectActions() {
         }
       }
       if (results.some((r) => r.error === 'not_found')) checkMissing()
-      if (problems.length) alert(`${t('actions.launchProblems')}\n\n${problems.join('\n')}`)
+      if (problems.length) showAlert(`${t('actions.launchProblems')}\n\n${problems.join('\n')}`)
     },
     openGithub: async (project) => {
-      if (!project.gitUrl) return alert(t('actions.noGithub'))
+      if (!project.gitUrl) return showAlert(t('actions.noGithub'))
       await api.openExternal(project.gitUrl)
       markOpened(project.id)
     }

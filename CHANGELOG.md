@@ -10,6 +10,7 @@
 
 ### Changed
 - Removing projects no longer asks for confirmation first; use Undo instead.
+- Dropdowns (sort order, editor, group, linked projects, launch script, "Move to group") and message boxes now follow the app's theme and style instead of Windows' plain menus and dialogs. Dropdowns work with the keyboard (arrows, Enter, Esc, type a letter to jump).
 
 ### Fixed
 - The window buttons in the top-left corner didn't respond to clicks.
