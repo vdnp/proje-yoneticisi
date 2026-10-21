@@ -1,7 +1,7 @@
 name: CI
 
-# Fast sanity check on every push and pull request: the app and the
-# browser preview both build.
+# Fast sanity check on every push and pull request: the unit tests pass and
+# the app and the browser preview both build.
 on:
   push:
     branches: [main]
@@ -20,5 +20,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm test
       - run: npx electron-vite build
       - run: npm run build:web

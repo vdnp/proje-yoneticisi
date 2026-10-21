@@ -82,6 +82,7 @@ Gerekenler: Windows üzerinde Node.js 22+ ve npm.
 npm install
 npm run dev         # anlık yenilemeli Electron uygulaması
 npm run dev:web     # arayüzü tarayıcıda, uydurma örnek verilerle çalıştırır
+npm test            # birim testleri (Vitest), tests/ klasöründe
 npm run build       # release/ klasörüne kurulum dosyası
 npm run build:store # release/ klasörüne Microsoft Store (MSIX) paketi
 ```

@@ -23,6 +23,7 @@
     "build": "electron-vite build && electron-builder --win",
     "build:store": "electron-vite build && electron-builder --win appx",
     "build:dir": "electron-vite build && electron-builder --win --dir",
+    "test": "vitest run",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "sharp": "^0.35.3",
     "tailwindcss": "^3.4.17",
     "vite": "^7.3.6",
+    "vitest": "^5.0.5",
     "zustand": "^5.0.2"
   },
   "build": {
