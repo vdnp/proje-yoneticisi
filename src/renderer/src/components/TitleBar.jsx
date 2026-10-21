@@ -52,6 +52,15 @@ export default function TitleBar() {
       style={drag}
       className="pm-glass relative flex h-8 shrink-0 select-none items-center border-b border-surface-border bg-surface-bg"
     >
+      {/* centered title. Kept clear of the traffic lights (left-24/right-24):
+          Electron's drag regions ignore pointer-events, so a drag area that
+          overlaps the buttons swallows their clicks (Windows treats them as
+          title-bar clicks and the page never sees them). */}
+      <div className="pointer-events-none absolute inset-y-0 left-24 right-24 flex items-center justify-center gap-2">
+        <Logo size={15} />
+        <span className="text-xs font-semibold text-content-secondary">{t('app.name')}</span>
+      </div>
+
       {/* traffic lights (left) */}
       <div className="group flex items-center gap-2 pl-3.5">
         <Light color="#ff5f57" glyph={glyphs.close} onClick={() => api.windowClose()} title={t('titlebar.close')} />
@@ -62,12 +71,6 @@ export default function TitleBar() {
           onClick={() => api.windowMaximizeToggle()}
           title={maximized ? t('titlebar.restore') : t('titlebar.maximize')}
         />
-      </div>
-
-      {/* centered title */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2">
-        <Logo size={15} />
-        <span className="text-xs font-semibold text-content-secondary">{t('app.name')}</span>
       </div>
     </div>
   )
