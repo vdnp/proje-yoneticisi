@@ -96,7 +96,7 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col gap-4 overflow-y-auto border-r border-surface-border bg-surface-bg p-4">
+    <aside className="pm-glass flex w-60 shrink-0 flex-col gap-4 overflow-y-auto border-r border-surface-border bg-surface-bg p-4">
       <button
         onClick={onAdd}
         className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand px-3 py-2.5 text-sm font-semibold text-onbrand shadow-sm transition hover:brightness-110 active:scale-[0.98]"

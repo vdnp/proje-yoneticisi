@@ -13,6 +13,7 @@ export const DEFAULT_DATA = {
     theme: 'dark', // 'dark' | 'light'
     language: 'auto', // 'auto' (follow the OS) | 'tr' | 'en'
     accent: 'indigo',
+    style: 'classic', // 'classic' | 'minimal' | 'glass' | 'soft' (see index.css)
     minimizeToTray: true,
     defaultEditor: 'code-insiders',
     editors: [

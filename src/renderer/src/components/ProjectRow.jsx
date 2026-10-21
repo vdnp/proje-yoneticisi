@@ -65,9 +65,10 @@ export default function ProjectRow({
       onDragLeave={dnd?.onDragLeave}
       onDrop={dnd?.onDrop}
       onDragEnd={dnd?.onDragEnd}
-      style={dropStyle(dnd?.side)}
+      // --pc feeds the "soft" style's project-colored tint (index.css).
+      style={{ '--pc': color || undefined, ...dropStyle(dnd?.side) }}
       className={cn(
-        'group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border bg-surface-card px-3 py-2.5 transition',
+        'pm-card group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border bg-surface-card px-3 py-2.5 transition',
         selected || checked
           ? 'border-brand ring-2 ring-brand/30'
           : 'border-surface-border hover:border-brand/40 hover:bg-surface-hover',
@@ -76,7 +77,7 @@ export default function ProjectRow({
     >
       {color && (
         <span
-          className="absolute inset-y-0 left-0 w-1"
+          className="pm-accent absolute inset-y-0 left-0 w-1"
           style={{ backgroundColor: color }}
           aria-hidden="true"
         />

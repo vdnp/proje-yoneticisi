@@ -273,7 +273,14 @@ export default {
   settings: {
     title: 'Settings',
     appearance: 'Appearance',
-    appearanceDesc: 'Theme, language and accent color.',
+    appearanceDesc: 'Theme, style, language and accent color.',
+    style: 'Style',
+    styles: {
+      classic: { name: 'Classic', desc: 'The look you know' },
+      minimal: { name: 'Minimal', desc: 'Hairlines, dense and crisp' },
+      glass: { name: 'Glass', desc: 'Translucent surfaces, depth' },
+      soft: { name: 'Soft', desc: 'Roomy cards in project colors' }
+    },
     dark: 'Dark',
     light: 'Light',
     language: 'Language',

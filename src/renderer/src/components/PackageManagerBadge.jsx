@@ -38,8 +38,9 @@ export default function PackageManagerBadge({ pm, tags, className = '' }) {
   return (
     <span
       title={t('pm.title', { pm })}
-      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ${className}`}
-      style={{ color, backgroundColor: color + '1a' }}
+      className={`pm-chip pm-pkg inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ${className}`}
+      // Text color comes from .pm-pkg (index.css) so light mode can deepen it.
+      style={{ '--pm': color, backgroundColor: color + '1a' }}
     >
       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
       {pm}

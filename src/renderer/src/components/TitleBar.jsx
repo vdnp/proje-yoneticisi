@@ -50,7 +50,7 @@ export default function TitleBar() {
   return (
     <div
       style={drag}
-      className="relative flex h-8 shrink-0 select-none items-center border-b border-surface-border bg-surface-bg"
+      className="pm-glass relative flex h-8 shrink-0 select-none items-center border-b border-surface-border bg-surface-bg"
     >
       {/* traffic lights (left) */}
       <div className="group flex items-center gap-2 pl-3.5">

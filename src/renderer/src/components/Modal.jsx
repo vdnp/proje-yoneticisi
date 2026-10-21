@@ -18,7 +18,7 @@ export default function Modal({ title, onClose, children, width = 'max-w-lg' }) 
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className={`w-full ${width} animate-fadein rounded-2xl border border-surface-border bg-surface-card shadow-card-hover`}
+        className={`pm-elevated w-full ${width} animate-fadein rounded-2xl border border-surface-border bg-surface-card shadow-card-hover`}
       >
         <div className="flex items-center justify-between border-b border-surface-border px-5 py-3.5">
           <h2 className="text-sm font-semibold text-content-primary">{title}</h2>

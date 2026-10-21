@@ -44,7 +44,7 @@ export function LinkChip({ linked }) {
   const names = linked.map((p) => p.name)
   return (
     <span
-      className="inline-flex max-w-full items-center gap-1 rounded-md bg-brand/10 px-1.5 py-0.5 text-[11px] font-medium text-brand"
+      className="pm-chip inline-flex max-w-full items-center gap-1 rounded-md bg-brand/10 px-1.5 py-0.5 text-[11px] font-medium text-brand"
       title={t('card.linked', { names: names.join(', ') })}
     >
       <Link size={11} className="shrink-0" />

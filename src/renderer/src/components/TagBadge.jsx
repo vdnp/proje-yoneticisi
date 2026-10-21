@@ -22,7 +22,7 @@ export default function TagBadge({ label, className = '' }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium ring-1 ring-inset',
+        'pm-chip inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium ring-1 ring-inset',
         color,
         className
       )}

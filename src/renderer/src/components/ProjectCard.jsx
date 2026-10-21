@@ -80,9 +80,10 @@ export default function ProjectCard({
       onDragLeave={dnd?.onDragLeave}
       onDrop={dnd?.onDrop}
       onDragEnd={dnd?.onDragEnd}
-      style={dropStyle(dnd?.side)}
+      // --pc feeds the "soft" style's project-colored tint (index.css).
+      style={{ '--pc': color || undefined, ...dropStyle(dnd?.side) }}
       className={cn(
-        'group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-surface-card p-4',
+        'pm-card group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-surface-card p-4',
         'shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover',
         selected || checked
           ? 'border-brand ring-2 ring-brand/30'
@@ -93,7 +94,7 @@ export default function ProjectCard({
       {/* group color accent */}
       {color && (
         <span
-          className="absolute inset-y-0 left-0 w-1"
+          className="pm-accent absolute inset-y-0 left-0 w-1"
           style={{ backgroundColor: color }}
           aria-hidden="true"
         />

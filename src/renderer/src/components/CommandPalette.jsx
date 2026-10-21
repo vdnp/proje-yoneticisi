@@ -131,7 +131,7 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl animate-fadein overflow-hidden rounded-2xl border border-surface-border bg-surface-card shadow-card-hover"
+        className="pm-elevated w-full max-w-xl animate-fadein overflow-hidden rounded-2xl border border-surface-border bg-surface-card shadow-card-hover"
       >
         <div className="flex items-center gap-3 border-b border-surface-border px-4">
           <Search size={17} className="shrink-0 text-content-faint" />

@@ -13,7 +13,7 @@ import {
   AlertTriangle
 } from '../components/Icons.jsx'
 import { cn, newId, relativeTime } from '../lib/utils.js'
-import { ACCENT_LIST } from '../lib/theme.js'
+import { ACCENT_LIST, STYLES } from '../lib/theme.js'
 import { LANGUAGES, useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
 import useStore from '../store/useStore.js'
@@ -52,6 +52,66 @@ function Toggle({ checked, onChange, label }) {
         )}
       />
     </button>
+  )
+}
+
+// A tiny drawing of two project cards in each style, rendered with inline
+// styles so every preview looks right whichever style is active.
+const PREVIEW = {
+  classic: {
+    box: {},
+    card: { borderRadius: 7, border: '1px solid rgb(var(--c-border))', background: 'rgb(var(--c-card))', boxShadow: '0 1px 3px rgb(0 0 0 / 0.15)' },
+    strip: true,
+    chip: { borderRadius: 3 }
+  },
+  minimal: {
+    box: {},
+    card: { borderRadius: 3, border: '1px solid rgb(var(--c-border))', background: 'rgb(var(--c-card))' },
+    chip: { borderRadius: 2, background: 'transparent', boxShadow: 'inset 0 0 0 1px rgb(var(--c-border))' }
+  },
+  glass: {
+    box: {
+      background:
+        'radial-gradient(120px 60px at 10% 0%, rgb(var(--c-brand) / 0.45), transparent 70%), radial-gradient(100px 70px at 100% 100%, rgb(var(--c-brand) / 0.25), transparent 70%), rgb(var(--c-bg))'
+    },
+    card: { borderRadius: 9, border: '1px solid rgb(255 255 255 / 0.12)', background: 'rgb(var(--c-card) / 0.45)', boxShadow: '0 6px 14px rgb(0 0 0 / 0.25)' },
+    chip: { borderRadius: 4 }
+  },
+  soft: {
+    box: {},
+    card: { borderRadius: 12, background: 'color-mix(in srgb, rgb(var(--c-brand)) 16%, rgb(var(--c-card)))', boxShadow: '0 3px 10px rgb(0 0 0 / 0.12)' },
+    second: { background: 'color-mix(in srgb, #86efac 16%, rgb(var(--c-card)))' },
+    chip: { borderRadius: 9999 }
+  }
+}
+
+function StylePreview({ id }) {
+  const p = PREVIEW[id]
+  const chip = {
+    height: 5,
+    width: 16,
+    background: 'rgb(var(--c-brand) / 0.35)',
+    ...p.chip
+  }
+  return (
+    <div className="flex h-16 items-center gap-1.5 rounded-lg bg-surface-bg px-2" style={p.box}>
+      {[0, 1].map((i) => (
+        <div
+          key={i}
+          className="relative flex h-11 flex-1 flex-col justify-center gap-1 overflow-hidden px-2"
+          style={{ ...p.card, ...(i === 1 ? p.second : null) }}
+        >
+          {p.strip && (
+            <span className="absolute inset-y-0 left-0 w-[3px]" style={{ background: i ? '#86efac' : 'rgb(var(--c-brand))' }} />
+          )}
+          <span className="h-1.5 w-3/4 rounded-full bg-content-secondary/60" />
+          <span className="flex gap-1">
+            <span style={chip} />
+            <span style={{ ...chip, background: 'rgb(134 239 172 / 0.4)' }} />
+          </span>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -231,6 +291,40 @@ export default function SettingsView({ onOpenProject }) {
                   <Icon size={16} /> {label}
                 </button>
               ))}
+            </div>
+
+            <div className="mt-4">
+              <label className="mb-2 block text-xs font-medium text-content-secondary">
+                {t('settings.style')}
+              </label>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {STYLES.map((id) => {
+                  const active = (settings.style || 'classic') === id
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => updateSettings({ style: id })}
+                      aria-pressed={active}
+                      className={cn(
+                        'flex flex-col gap-2 rounded-xl border p-2 text-left transition',
+                        active
+                          ? 'border-brand/60 bg-brand/10 ring-1 ring-brand/30'
+                          : 'border-surface-border hover:bg-surface-hover'
+                      )}
+                    >
+                      <StylePreview id={id} />
+                      <span className="px-0.5">
+                        <span className="block text-sm font-medium text-content-primary">
+                          {t(`settings.styles.${id}.name`)}
+                        </span>
+                        <span className="block text-[11px] leading-snug text-content-faint">
+                          {t(`settings.styles.${id}.desc`)}
+                        </span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             <div className="mt-4">

@@ -23,9 +23,18 @@ export default {
         },
         onbrand: 'rgb(var(--c-on-brand) / <alpha-value>)'
       },
+      // Radii and shadows come from CSS variables so the selectable styles
+      // (classic / minimal / glass / soft, see index.css) can reshape every
+      // component without touching its classes. Fallbacks = Tailwind defaults.
+      borderRadius: {
+        md: 'var(--r-md, 0.375rem)',
+        lg: 'var(--r-lg, 0.5rem)',
+        xl: 'var(--r-xl, 0.75rem)',
+        '2xl': 'var(--r-2xl, 1rem)'
+      },
       boxShadow: {
-        card: '0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04)',
-        'card-hover': '0 8px 24px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06)'
+        card: 'var(--sh-card)',
+        'card-hover': 'var(--sh-card-hover)'
       },
       fontFamily: {
         sans: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif']

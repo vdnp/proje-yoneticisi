@@ -3,6 +3,11 @@
 ## Unreleased
 
 ### Added
+- **Styles.** Settings → Appearance → Style offers four looks: Classic (the original), Minimal (Linear/Raycast-like: hairlines, tight corners, no shadows), Glass (Fluent/macOS-like: translucent surfaces over a soft accent-tinted backdrop) and Soft (Notion/Arc-like: roomy cards tinted with the project's color, pill chips). Each works with the dark and light themes and every accent color.
+
+### Fixed
+- Tag and package-manager chips were hard to read in the light theme.
+
 - **Update check** in Settings → Updates: shows whether a newer version is on GitHub, with a link to download it, and a small dot on Settings in the sidebar when there is one. Checks only when you click **Check now**, or once a day if you turn on **Check automatically** (off by default). The Microsoft Store version is updated by the Store and doesn't check.
 
 ## 1.4.0

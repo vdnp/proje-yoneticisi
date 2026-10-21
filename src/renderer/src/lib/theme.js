@@ -19,11 +19,17 @@ export const ACCENTS = {
 
 export const ACCENT_LIST = Object.entries(ACCENTS).map(([id, v]) => ({ id, ...v }))
 
+// Visual styles, selectable in Settings. Each one is a block of CSS variables
+// (and a few rules) in index.css keyed on <html data-style="...">.
+// Names live in the locale files under `settings.styles.<id>`.
+export const STYLES = ['classic', 'minimal', 'glass', 'soft']
+
 // Apply theme (dark/light) and accent color to the document root.
 export function applyTheme(settings = {}) {
   const root = document.documentElement
   const isLight = settings.theme === 'light'
   root.classList.toggle('light', isLight)
+  root.dataset.style = STYLES.includes(settings.style) ? settings.style : 'classic'
 
   const accent = ACCENTS[settings.accent] || ACCENTS.indigo
   root.style.setProperty('--c-brand', isLight ? accent.light : accent.dark)

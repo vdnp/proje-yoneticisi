@@ -29,7 +29,7 @@ Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevler
 - **Toplu işlemler**: <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+tıklama ile birden çok proje seç; hepsini birden favorile, sabitle, etiketle, gruba taşı, birbirine bağla ya da listeden kaldır.
 - **Tepsi menüsü**: Favori ve son açılan projeler; pencereyi açmadan projeyi aç.
 - **Bakım**: Taşınan ya da silinen proje klasörlerini fark eder, etiketleri yeniden algılar, yedeği dışa/içe aktarır.
-- **Türkçe ve İngilizce** arayüz, karanlık ve aydınlık tema, sekiz vurgu rengi.
+- **Türkçe ve İngilizce** arayüz, karanlık ve aydınlık tema, dört stil (Klasik, Sade, Cam, Yumuşak) ve sekiz vurgu rengi.
 
 <table>
   <tr>

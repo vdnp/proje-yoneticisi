@@ -111,7 +111,7 @@ const useStore = create((set, get) => ({
   // ---- settings ----
   updateSettings: (patch) => {
     set((s) => ({ settings: { ...s.settings, ...patch } }))
-    if ('theme' in patch || 'accent' in patch) applyTheme(get().settings)
+    if ('theme' in patch || 'accent' in patch || 'style' in patch) applyTheme(get().settings)
     schedulePersist(get)
   },
 

@@ -262,7 +262,14 @@ export default {
   settings: {
     title: 'Ayarlar',
     appearance: 'Görünüm',
-    appearanceDesc: 'Tema, dil ve vurgu rengi.',
+    appearanceDesc: 'Tema, stil, dil ve vurgu rengi.',
+    style: 'Stil',
+    styles: {
+      classic: { name: 'Klasik', desc: 'Alışık olduğun görünüm' },
+      minimal: { name: 'Sade', desc: 'İnce çizgiler, yoğun ve keskin' },
+      glass: { name: 'Cam', desc: 'Yarı saydam yüzeyler, derinlik' },
+      soft: { name: 'Yumuşak', desc: 'Proje renginde, ferah kartlar' }
+    },
     dark: 'Karanlık',
     light: 'Aydınlık',
     language: 'Dil',

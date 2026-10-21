@@ -29,6 +29,152 @@
   --c-on-brand: 255 255 255; /* white ink on vivid brand fills */
 }
 
+/* ---- Visual styles ------------------------------------------------------
+   Picked in Settings (settings.style → <html data-style>). Tailwind's rounded-*
+   and shadow-card* utilities read these variables (tailwind.config.js), so a
+   style reshapes every component; the few extra rules below hook onto marker
+   classes: pm-card (project cards/rows, with --pc = project color), pm-accent
+   (their color strip), pm-chip (tags/badges), pm-glass (sidebar, title bar)
+   and pm-elevated (modals, palette). Works with both light and dark themes. */
+
+/* Classic: the original look. */
+:root {
+  --r-md: 0.375rem;
+  --r-lg: 0.5rem;
+  --r-xl: 0.75rem;
+  --r-2xl: 1rem;
+  --sh-card: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
+  --sh-card-hover: 0 8px 24px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
+}
+
+/* Minimal: Linear/Raycast-like. Neutral zinc surfaces, tight radii, hairline
+   borders, no shadows or lift; color is kept for accents only. */
+:root[data-style='minimal'] {
+  --c-bg: 9 9 11;
+  --c-card: 17 17 19;
+  --c-hover: 26 26 30;
+  --c-border: 39 39 44;
+  --r-md: 4px;
+  --r-lg: 5px;
+  --r-xl: 6px;
+  --r-2xl: 8px;
+  --sh-card: none;
+  --sh-card-hover: none;
+}
+:root.light[data-style='minimal'] {
+  --c-bg: 250 250 250;
+  --c-card: 255 255 255;
+  --c-hover: 244 244 245;
+  --c-border: 228 228 231;
+}
+[data-style='minimal'] .pm-card:hover {
+  transform: none;
+  background-color: rgb(var(--c-hover));
+}
+[data-style='minimal'] .pm-accent {
+  width: 2px;
+}
+[data-style='minimal'] .pm-card h3 {
+  letter-spacing: -0.01em;
+}
+[data-style='minimal'] .pm-chip {
+  color: rgb(var(--c-text-dim));
+  background-color: transparent;
+  --tw-ring-color: rgb(var(--c-border));
+}
+
+/* Glass: macOS / Windows 11 Fluent-like. A soft accent-tinted backdrop shows
+   through translucent surfaces; bars and dialogs blur what's behind them. */
+:root[data-style='glass'] {
+  --r-md: 8px;
+  --r-lg: 10px;
+  --r-xl: 14px;
+  --r-2xl: 18px;
+  --sh-card: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 8px 24px rgb(0 0 0 / 0.22);
+  --sh-card-hover: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 18px 40px rgb(0 0 0 / 0.32);
+  --glass-line: rgb(255 255 255 / 0.08);
+  --glass-glow: 0.36;
+}
+:root.light[data-style='glass'] {
+  --sh-card: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 6px 20px rgb(15 23 42 / 0.07);
+  --sh-card-hover: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 16px 36px rgb(15 23 42 / 0.12);
+  --glass-line: rgb(15 23 42 / 0.08);
+  --glass-glow: 0.3;
+}
+/* On #root rather than body: a body background is propagated to the canvas,
+   which isn't painted reliably in every capture/compositing path. */
+[data-style='glass'] #root {
+  background:
+    radial-gradient(1000px 760px at 18% 0%, rgb(var(--c-brand) / var(--glass-glow)), transparent 78%),
+    radial-gradient(900px 760px at 100% 50%, rgb(var(--c-brand) / calc(var(--glass-glow) * 0.7)), transparent 78%),
+    radial-gradient(1000px 640px at 35% 100%, rgb(var(--c-brand) / calc(var(--glass-glow) * 0.55)), transparent 78%),
+    rgb(var(--c-bg));
+}
+[data-style='glass'] .bg-surface-bg {
+  --tw-bg-opacity: 0.3;
+}
+[data-style='glass'] .bg-surface-card {
+  --tw-bg-opacity: 0.5;
+}
+/* A faint top highlight makes the panes read as glass rather than flat. */
+[data-style='glass'] .pm-card {
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0) 60%);
+}
+[data-style='glass'] .border-surface-border {
+  border-color: var(--glass-line);
+}
+[data-style='glass'] .pm-glass {
+  backdrop-filter: blur(20px) saturate(1.4);
+}
+[data-style='glass'] .pm-elevated {
+  --tw-bg-opacity: 0.78;
+  backdrop-filter: blur(28px) saturate(1.5);
+}
+
+/* Soft: Notion/Arc-like. Cards are tinted with their project color instead
+   of a strip, borderless, roomy, with pill-shaped chips. */
+:root[data-style='soft'] {
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 14px;
+  --r-2xl: 22px;
+  --sh-card: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.06);
+  --sh-card-hover: 0 14px 34px rgb(0 0 0 / 0.16);
+}
+[data-style='soft'] .pm-card {
+  border-color: transparent;
+  background-color: color-mix(in srgb, var(--pc, rgb(var(--c-brand))) 10%, rgb(var(--c-card)));
+}
+[data-style='soft'] .pm-card:hover {
+  background-color: color-mix(in srgb, var(--pc, rgb(var(--c-brand))) 15%, rgb(var(--c-card)));
+}
+[data-style='soft'] .pm-card.p-4 {
+  padding: 1.15rem;
+}
+[data-style='soft'] .pm-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+}
+[data-style='soft'] .pm-accent {
+  display: none;
+}
+[data-style='soft'] .pm-chip {
+  border-radius: 9999px;
+  padding-inline: 0.5rem;
+}
+
+/* Tag colors are pastel (-300) for dark surfaces; on light ones they need
+   the deeper -700 tones to stay readable. */
+:root.light .text-indigo-300 { color: rgb(67 56 202); }
+:root.light .text-emerald-300 { color: rgb(4 120 87); }
+:root.light .text-amber-300 { color: rgb(180 83 9); }
+:root.light .text-sky-300 { color: rgb(3 105 161); }
+:root.light .text-rose-300 { color: rgb(190 18 60); }
+:root.light .text-violet-300 { color: rgb(109 40 217); }
+:root.light .text-teal-300 { color: rgb(15 118 110); }
+.pm-pkg { color: var(--pm); }
+:root.light .pm-pkg { color: color-mix(in srgb, var(--pm) 45%, #000); }
+
 html,
 body,
 #root {
