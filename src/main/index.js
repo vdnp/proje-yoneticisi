@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, dialog, globalShortcut, Tray, Menu,
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { spawn, execFile } from 'child_process'
-import { loadData, saveData, getDataFilePath } from './store.js'
+import { loadData, saveData, getDataFilePath, listSnapshots, readSnapshot } from './store.js'
 import { hydrate } from './schema.js'
 import { launchPlan } from '../shared/links.js'
 import { parseVersion, isNewer } from './version.js'
@@ -434,6 +434,11 @@ function registerIpc() {
       return { ok: false, error: 'invalid_backup' }
     }
   })
+
+  // Daily snapshots kept next to data.json. Restoring reads one and hands it
+  // to the same merge / replace choice as an import.
+  ipcMain.handle('backups:list', () => listSnapshots())
+  ipcMain.handle('backups:read', (_e, name) => readSnapshot(name))
 
   ipcMain.handle('dialog:selectFolder', async (_e, defaultPath) => {
     const result = await dialog.showOpenDialog(mainWindow, {

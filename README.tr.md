@@ -70,7 +70,7 @@ Her şey bilgisayarında, tek bir JSON dosyasında durur:
 %APPDATA%\project-manager\data.json
 ```
 
-Her kayıttan önce önceki halin `.bak` kopyası yazılır; dosya bir gün bozulursa uygulama kendini ondan kurtarır. **Ayarlar → Yedekleme** ile her şeyi dışa ya da içe aktarabilirsin.
+Her kayıttan önce önceki halin `.bak` kopyası yazılır; dosya bir gün bozulursa uygulama kendini ondan kurtarır. Ayrıca yanındaki `backups` klasöründe son 7 günün günlük kopyaları tutulur. **Ayarlar → Yedekleme** bu kopyaları listeler ve istediğini geri yükler; her şeyi dışa ya da içe aktarmak da oradan yapılır.
 
 Uygulama kendi başına hiçbir ağ isteği yapmaz. İnternete giden tek şey tarayıcıda açtığın bağlantılar ve bir projenin README'sine gömülü `https` görselleridir.
 

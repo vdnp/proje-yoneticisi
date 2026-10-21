@@ -4,13 +4,16 @@
 
 ### Added
 - **Styles.** Settings → Appearance → Style offers four looks: Classic (the original), Minimal (Linear/Raycast-like: hairlines, tight corners, no shadows), Glass (Fluent/macOS-like: translucent surfaces over a soft accent-tinted backdrop) and Soft (Notion/Arc-like: roomy cards tinted with the project's color, pill chips). Each works with the dark and light themes and every accent color.
-
-### Fixed
-- Tag and package-manager chips were hard to read in the light theme.
-
 - **Update check** in Settings → Updates: shows whether a newer version is on GitHub, with a link to download it, and a small dot on Settings in the sidebar when there is one. Checks only when you click **Check now**, or once a day if you turn on **Check automatically** (off by default). The Microsoft Store version is updated by the Store and doesn't check.
+- **Daily backups.** Besides the `.bak` copy, a copy of your data is kept for each of the last 7 days in a `backups` folder next to `data.json`. Settings → Backup lists them (date and project count) and restores any of them with the same merge / replace choice as an import.
+- **Undo.** Removing a project (from its page, Settings or the selection bar) or deleting a to-do shows a short "Undo" message at the bottom of the window. Undo brings back exactly what was removed, including its links to other projects.
+
+### Changed
+- Removing projects no longer asks for confirmation first; use Undo instead.
 
 ### Fixed
+- The window buttons in the top-left corner didn't respond to clicks.
+- Tag and package-manager chips were hard to read in the light theme.
 - Search (the command palette, the project list and the task list) now finds names with a capital I when you type a lowercase i, and the other way round: "ai" finds "AI Chat", "API" finds "api".
 - An older data file with an empty entry in its editors list no longer fails to load.
 

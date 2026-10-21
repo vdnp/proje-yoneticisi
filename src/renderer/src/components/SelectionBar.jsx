@@ -52,8 +52,8 @@ export default function SelectionBar({ ids, onClear }) {
     setTagging(false)
   }
 
+  // No confirm: the undo toast can bring them back.
   const remove = () => {
-    if (!confirm(t('selection.confirmRemove', { count: ids.length }))) return
     removeProjects(ids)
     onClear()
   }

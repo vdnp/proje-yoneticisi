@@ -9,6 +9,7 @@ import AddProjectModal from './components/AddProjectModal.jsx'
 import CommandPalette from './components/CommandPalette.jsx'
 import ScanModal from './components/ScanModal.jsx'
 import GroupModal from './components/GroupModal.jsx'
+import UndoToast from './components/UndoToast.jsx'
 import { Folder } from './components/Icons.jsx'
 import { todoProgress, samePath } from './lib/utils.js'
 import { useI18n } from './lib/i18n.js'
@@ -231,6 +232,8 @@ export default function App() {
       )}
 
       {groupModal && <GroupModal group={groupModal.group} onClose={() => setGroupModal(null)} />}
+
+      <UndoToast />
 
       {paletteOpen && (
         <CommandPalette

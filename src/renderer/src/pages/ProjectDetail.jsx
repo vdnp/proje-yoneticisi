@@ -310,11 +310,10 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
     }
   }
 
-  const confirmRemove = () => {
-    if (confirm(t('detail.confirmRemove', { name: project.name }))) {
-      removeProject(project.id)
-      onBack()
-    }
+  // No confirm: the undo toast can bring it back.
+  const remove = () => {
+    removeProject(project.id)
+    onBack()
   }
 
   const redetectTags = async () => {
@@ -385,7 +384,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
             <Star size={18} fill={project.favorite ? 'currentColor' : 'none'} />
           </button>
           <button
-            onClick={confirmRemove}
+            onClick={remove}
             className="grid h-9 w-9 place-items-center rounded-xl border border-surface-border text-content-faint transition hover:border-rose-500/40 hover:text-rose-400"
             title={t('detail.removeFromList')}
             aria-label={t('detail.removeFromList')}
@@ -413,7 +412,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
                 {t('detail.relocate')}
               </button>
               <button
-                onClick={confirmRemove}
+                onClick={remove}
                 className="rounded-xl border border-surface-border px-3 py-2 text-sm font-medium text-content-secondary transition hover:bg-surface-hover"
               >
                 {t('detail.removeFromList')}

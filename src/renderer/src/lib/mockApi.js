@@ -317,6 +317,16 @@ const mockApi = {
       }
       input.click()
     }),
+  // Two fake daily snapshots, both holding the sample data.
+  listBackups: async () =>
+    [1, 2].map((ago) => {
+      const date = new Date(now - ago * day).toLocaleDateString('sv') // YYYY-MM-DD
+      return { name: `data-${date}.json`, date, projects: SAMPLE.projects.length }
+    }),
+  readBackup: async (name) =>
+    /^data-\d{4}-\d{2}-\d{2}\.json$/.test(name)
+      ? { ok: true, data: structuredClone(SAMPLE) }
+      : { ok: false, error: 'invalid_backup' },
 
   selectFolder: async () => ({ ok: true, path: 'C:\\Projects\\new-project-' + uid() }),
   inspectFolder: async (folderPath) => ({
