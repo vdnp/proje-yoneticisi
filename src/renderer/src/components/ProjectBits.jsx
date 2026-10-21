@@ -37,6 +37,29 @@ export function useLinked(project) {
   return linkedProjects(project, projects)
 }
 
+// Monogram tile before the name (the "border" card color): the project's
+// initial on a tint of its color, or neutral when it has none.
+export function ProjectMark({ name, color, size = 26 }) {
+  // Plain toUpperCase: project names are mostly English, where Turkish
+  // casing would turn "inventory" into "İ".
+  const initial = (String(name || '?').trim()[0] || '?').toUpperCase()
+  return (
+    <span
+      // Text color comes from .pm-mark (index.css) so light mode can deepen it.
+      className="pm-mark grid shrink-0 place-items-center rounded-lg text-[13px] font-semibold"
+      style={{
+        width: size,
+        height: size,
+        '--pm': color || 'rgb(var(--c-text-dim))',
+        backgroundColor: color ? `color-mix(in srgb, ${color} 20%, rgb(var(--c-card)))` : 'rgb(var(--c-hover))'
+      }}
+      aria-hidden="true"
+    >
+      {initial}
+    </span>
+  )
+}
+
 // "🔗 inventory-api +1"
 export function LinkChip({ linked }) {
   const { t } = useI18n()

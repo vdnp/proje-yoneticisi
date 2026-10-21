@@ -172,8 +172,31 @@
 :root.light .text-rose-300 { color: rgb(190 18 60); }
 :root.light .text-violet-300 { color: rgb(109 40 217); }
 :root.light .text-teal-300 { color: rgb(15 118 110); }
-.pm-pkg { color: var(--pm); }
-:root.light .pm-pkg { color: color-mix(in srgb, var(--pm) 45%, #000); }
+.pm-pkg,
+.pm-mark { color: var(--pm); }
+:root.light .pm-pkg,
+:root.light .pm-mark { color: color-mix(in srgb, var(--pm) 45%, #000); }
+
+/* The "side column" card layout: in narrow cards (the recently-opened strip)
+   the facts column moves under the content as one row. */
+.pm-card {
+  container-type: inline-size;
+}
+@container (max-width: 280px) {
+  .pm-side {
+    flex-direction: column;
+  }
+  .pm-side-col {
+    width: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid rgb(var(--c-border));
+    padding-top: 0.5rem;
+  }
+}
 
 html,
 body,

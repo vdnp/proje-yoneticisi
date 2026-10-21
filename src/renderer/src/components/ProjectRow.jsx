@@ -2,7 +2,7 @@ import TagBadge from './TagBadge.jsx'
 import PackageManagerBadge from './PackageManagerBadge.jsx'
 import GitBadge from './GitBadge.jsx'
 import { Star, Pin, Code, Folder, Terminal, Github, CheckSquare, AlertTriangle, Play } from './Icons.jsx'
-import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle } from './ProjectBits.jsx'
+import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle, ProjectMark } from './ProjectBits.jsx'
 import { isLaunchable } from '../../../shared/links.js'
 import { cn, relativeTime, todoProgress } from '../lib/utils.js'
 import { projectColorHex } from '../lib/groups.js'
@@ -45,6 +45,7 @@ export default function ProjectRow({
   const toggleFavorite = useStore((s) => s.toggleFavorite)
   const togglePin = useStore((s) => s.togglePin)
   const groups = useStore((s) => s.groups)
+  const cardColor = useStore((s) => s.settings.cardColor || 'strip')
   const missing = useStore((s) => !!s.missing[project.path])
   const actions = useProjectActions()
   const { t, lang } = useI18n()
@@ -66,7 +67,13 @@ export default function ProjectRow({
       onDrop={dnd?.onDrop}
       onDragEnd={dnd?.onDragEnd}
       // --pc feeds the "soft" style's project-colored tint (index.css).
-      style={{ '--pc': color || undefined, ...dropStyle(dnd?.side) }}
+      style={{
+        '--pc': color || undefined,
+        ...(cardColor === 'border' && color && !(selected || checked)
+          ? { borderColor: `color-mix(in srgb, ${color} 55%, rgb(var(--c-border)))` }
+          : null),
+        ...dropStyle(dnd?.side)
+      }}
       className={cn(
         'pm-card group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border bg-surface-card px-3 py-2.5 transition',
         selected || checked
@@ -75,7 +82,7 @@ export default function ProjectRow({
         checked && 'bg-brand/5'
       )}
     >
-      {color && (
+      {cardColor === 'strip' && color && (
         <span
           className="pm-accent absolute inset-y-0 left-0 w-1"
           style={{ backgroundColor: color }}
@@ -118,6 +125,8 @@ export default function ProjectRow({
           <Star size={15} fill={project.favorite ? 'currentColor' : 'none'} />
         </button>
       </div>
+
+      {cardColor === 'border' && <ProjectMark name={project.name} color={color} size={24} />}
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
@@ -196,6 +205,19 @@ export default function ProjectRow({
           <Github size={16} />
         </IconBtn>
       </div>
+
+      {cardColor === 'progress' && (
+        <span
+          className="pm-progress absolute inset-x-0 bottom-0 h-[3px]"
+          style={{ backgroundColor: `color-mix(in srgb, ${color || 'rgb(var(--c-brand))'} 22%, transparent)` }}
+          aria-hidden="true"
+        >
+          <span
+            className="block h-full"
+            style={{ width: total ? `${(done / total) * 100}%` : 0, backgroundColor: color || 'rgb(var(--c-brand))' }}
+          />
+        </span>
+      )}
     </div>
   )
 }

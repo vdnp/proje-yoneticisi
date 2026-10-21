@@ -24,6 +24,11 @@ export const ACCENT_LIST = Object.entries(ACCENTS).map(([id, v]) => ({ id, ...v 
 // Names live in the locale files under `settings.styles.<id>`.
 export const STYLES = ['classic', 'minimal', 'glass', 'soft']
 
+// How project cards show their color and lay out their content (ProjectCard).
+// Names live under `settings.cardColors.<id>` / `settings.cardLayouts.<id>`.
+export const CARD_COLORS = ['strip', 'border', 'progress']
+export const CARD_LAYOUTS = ['standard', 'status', 'side']
+
 // Apply theme (dark/light) and accent color to the document root.
 export function applyTheme(settings = {}) {
   const root = document.documentElement

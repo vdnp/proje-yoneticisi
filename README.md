@@ -29,7 +29,7 @@ Find any project in a keystroke, open it in your editor, and see its git status 
 - **Bulk actions**: <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+click to select several projects, then favorite, pin, tag, group, link or remove them at once.
 - **Tray menu** with favorites and recent projects; open one without opening the window.
 - **Maintenance**: spots projects whose folder was moved or deleted, re-detects tags, exports and imports backups.
-- **Turkish and English** UI, dark and light themes, four styles (Classic, Minimal, Glass, Soft) and eight accent colors.
+- **Turkish and English** UI, dark and light themes, four styles (Classic, Minimal, Glass, Soft), three card colorings and layouts, and eight accent colors.
 
 <table>
   <tr>

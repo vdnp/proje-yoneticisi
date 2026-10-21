@@ -14,7 +14,7 @@ import {
   AlertTriangle
 } from '../components/Icons.jsx'
 import { cn, newId, relativeTime, formatDate } from '../lib/utils.js'
-import { ACCENT_LIST, STYLES } from '../lib/theme.js'
+import { ACCENT_LIST, STYLES, CARD_COLORS, CARD_LAYOUTS } from '../lib/theme.js'
 import { LANGUAGES, useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
 import useStore from '../store/useStore.js'
@@ -113,6 +113,80 @@ function StylePreview({ id }) {
         </div>
       ))}
     </div>
+  )
+}
+
+// Segmented choice with a small glyph per option (card color / layout).
+function Segmented({ label, value, options, onChange }) {
+  return (
+    <div className="mt-4">
+      <label className="mb-2 block text-xs font-medium text-content-secondary">{label}</label>
+      <div className="grid grid-cols-3 gap-2">
+        {options.map((o) => (
+          <button
+            key={o.id}
+            onClick={() => onChange(o.id)}
+            aria-pressed={value === o.id}
+            className={cn(
+              'flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition',
+              value === o.id
+                ? 'border-brand/60 bg-brand/10 ring-1 ring-brand/30'
+                : 'border-surface-border hover:bg-surface-hover'
+            )}
+          >
+            <span className="relative h-8 w-11 shrink-0 overflow-hidden rounded-md border border-surface-border bg-surface-bg">
+              {o.glyph}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-medium text-content-primary">{o.name}</span>
+              <span className="block truncate text-[11px] text-content-faint">{o.desc}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const CARD_GLYPHS = {
+  strip: <span className="absolute inset-y-0 left-0 w-1 bg-brand" />,
+  border: (
+    <span className="absolute inset-0.5 rounded border border-brand/70">
+      <span className="absolute left-1 top-1 h-2.5 w-2.5 rounded-sm bg-brand/30" />
+    </span>
+  ),
+  progress: (
+    <span className="absolute inset-x-0 bottom-0 h-1 bg-brand/25">
+      <span className="block h-full w-3/5 bg-brand" />
+    </span>
+  ),
+  standard: (
+    <span className="absolute inset-1.5 flex flex-col gap-1">
+      <span className="h-1 w-3/4 rounded-full bg-content-secondary/60" />
+      <span className="h-1 w-full rounded-full bg-content-faint/40" />
+      <span className="h-1 w-1/2 rounded-full bg-content-faint/40" />
+    </span>
+  ),
+  status: (
+    <span className="absolute inset-1.5 flex flex-col gap-1">
+      <span className="h-1 w-3/4 rounded-full bg-content-secondary/60" />
+      <span className="mt-0.5 h-1 w-full rounded-full bg-content-faint/30">
+        <span className="block h-full w-3/5 rounded-full bg-brand" />
+      </span>
+      <span className="h-1 w-2/3 rounded-full bg-content-faint/40" />
+    </span>
+  ),
+  side: (
+    <span className="absolute inset-1.5 flex gap-1">
+      <span className="flex flex-1 flex-col gap-1">
+        <span className="h-1 w-full rounded-full bg-content-secondary/60" />
+        <span className="h-1 w-3/4 rounded-full bg-content-faint/40" />
+      </span>
+      <span className="flex w-2.5 flex-col gap-1 border-l border-content-faint/40 pl-0.5">
+        <span className="h-1 rounded-full bg-content-faint/50" />
+        <span className="h-1 rounded-full bg-content-faint/50" />
+      </span>
+    </span>
   )
 }
 
@@ -342,6 +416,29 @@ export default function SettingsView({ onOpenProject }) {
                 })}
               </div>
             </div>
+
+            <Segmented
+              label={t('settings.cardColor')}
+              value={settings.cardColor || 'strip'}
+              onChange={(id) => updateSettings({ cardColor: id })}
+              options={CARD_COLORS.map((id) => ({
+                id,
+                glyph: CARD_GLYPHS[id],
+                name: t(`settings.cardColors.${id}.name`),
+                desc: t(`settings.cardColors.${id}.desc`)
+              }))}
+            />
+            <Segmented
+              label={t('settings.cardLayout')}
+              value={settings.cardLayout || 'standard'}
+              onChange={(id) => updateSettings({ cardLayout: id })}
+              options={CARD_LAYOUTS.map((id) => ({
+                id,
+                glyph: CARD_GLYPHS[id],
+                name: t(`settings.cardLayouts.${id}.name`),
+                desc: t(`settings.cardLayouts.${id}.desc`)
+              }))}
+            />
 
             <div className="mt-4">
               <label className="mb-2 block text-xs font-medium text-content-secondary">

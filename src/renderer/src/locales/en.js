@@ -86,7 +86,11 @@ export default {
     openTasks_other: '{count} open tasks',
     select: 'Select (Ctrl+click or Shift+click works too)',
     linked: 'Linked: {names}',
-    launchTitle: 'Launch: {what}'
+    launchTitle: 'Launch: {what}',
+    tasks: 'Tasks',
+    nextTask: 'Next: {task}',
+    allTasksDone: 'All tasks done',
+    noTasks: 'No tasks yet'
   },
   selection: {
     count_one: '{count} project selected',
@@ -286,6 +290,18 @@ export default {
       minimal: { name: 'Minimal', desc: 'Hairlines, dense and crisp' },
       glass: { name: 'Glass', desc: 'Translucent surfaces, depth' },
       soft: { name: 'Soft', desc: 'Roomy cards in project colors' }
+    },
+    cardColor: 'Card color',
+    cardColors: {
+      strip: { name: 'Strip', desc: 'Color strip on the left' },
+      border: { name: 'Border', desc: 'Colored edge and initial' },
+      progress: { name: 'Task bar', desc: 'Task progress at the bottom' }
+    },
+    cardLayout: 'Card layout',
+    cardLayouts: {
+      standard: { name: 'Standard', desc: 'Description and tags' },
+      status: { name: 'Status', desc: 'Git, tasks, what’s next' },
+      side: { name: 'Side column', desc: 'Facts in a right column' }
     },
     dark: 'Dark',
     light: 'Light',

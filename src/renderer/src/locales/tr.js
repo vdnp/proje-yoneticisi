@@ -84,7 +84,11 @@ export default {
     openTasks: '{count} açık görev',
     select: 'Seç (Ctrl veya Shift ile tıklayarak da seçebilirsin)',
     linked: 'Bağlı: {names}',
-    launchTitle: 'Başlat: {what}'
+    launchTitle: 'Başlat: {what}',
+    tasks: 'Görevler',
+    nextTask: 'Sıradaki: {task}',
+    allTasksDone: 'Bütün görevler tamam',
+    noTasks: 'Henüz görev yok'
   },
   selection: {
     count: '{count} proje seçildi',
@@ -275,6 +279,18 @@ export default {
       minimal: { name: 'Sade', desc: 'İnce çizgiler, yoğun ve keskin' },
       glass: { name: 'Cam', desc: 'Yarı saydam yüzeyler, derinlik' },
       soft: { name: 'Yumuşak', desc: 'Proje renginde, ferah kartlar' }
+    },
+    cardColor: 'Kart rengi',
+    cardColors: {
+      strip: { name: 'Şerit', desc: 'Solda renk çizgisi' },
+      border: { name: 'Kenarlık', desc: 'Renkli kenar ve harf' },
+      progress: { name: 'Görev çubuğu', desc: 'Altta görev ilerlemesi' }
+    },
+    cardLayout: 'Kart düzeni',
+    cardLayouts: {
+      standard: { name: 'Standart', desc: 'Açıklama ve etiketler' },
+      status: { name: 'Durum odaklı', desc: 'Git, görevler, sıradaki iş' },
+      side: { name: 'Yan sütun', desc: 'Bilgiler sağ sütunda' }
     },
     dark: 'Karanlık',
     light: 'Aydınlık',

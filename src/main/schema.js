@@ -14,6 +14,8 @@ export const DEFAULT_DATA = {
     language: 'auto', // 'auto' (follow the OS) | 'tr' | 'en'
     accent: 'indigo',
     style: 'classic', // 'classic' | 'minimal' | 'glass' | 'soft' (see index.css)
+    cardColor: 'strip', // 'strip' | 'border' | 'progress' (see ProjectCard)
+    cardLayout: 'standard', // 'standard' | 'status' | 'side'
     minimizeToTray: true,
     defaultEditor: 'code-insiders',
     editors: [
