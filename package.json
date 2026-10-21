@@ -1,6 +1,6 @@
 {
   "name": "project-manager",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A keyboard-first desktop hub for your local projects: open them in your editor, see git status, track tasks.",
   "license": "MIT",
   "author": "vdnp",
