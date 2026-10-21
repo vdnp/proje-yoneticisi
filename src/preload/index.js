@@ -43,6 +43,19 @@ const api = {
   windowMaximizeToggle: () => ipcRenderer.send('window:maximizeToggle'),
   windowClose: () => ipcRenderer.send('window:close'),
   windowIsMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+  setAlwaysOnTop: (on) => ipcRenderer.invoke('window:setAlwaysOnTop', on),
+  isAlwaysOnTop: () => ipcRenderer.invoke('window:isAlwaysOnTop'),
+
+  // Mini window
+  openMini: () => ipcRenderer.send('mini:open'),
+  expandMini: () => ipcRenderer.send('mini:expand'),
+  closeMini: () => ipcRenderer.send('mini:close'),
+  notifyOpened: (ids) => ipcRenderer.send('mini:opened', ids),
+  onDataChanged: (cb) => {
+    const listener = (_e, data) => cb(data)
+    ipcRenderer.on('data:changed', listener)
+    return () => ipcRenderer.removeListener('data:changed', listener)
+  },
   onWindowMaximize: (cb) => {
     const listener = (_e, val) => cb(val)
     ipcRenderer.on('window:maximized', listener)

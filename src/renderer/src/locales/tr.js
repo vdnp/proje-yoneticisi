@@ -25,7 +25,27 @@ export default {
     close: 'Kapat',
     minimize: 'Küçült',
     maximize: 'Büyüt',
-    restore: 'Önceki boyut'
+    restore: 'Önceki boyut',
+    back: 'Geri',
+    forward: 'İleri',
+    location: 'Konum',
+    darkTheme: 'Karanlık temaya geç',
+    lightTheme: 'Aydınlık temaya geç',
+    alwaysOnTop: 'Her zaman üstte',
+    mini: 'Mini pencere'
+  },
+  mini: {
+    search: 'Proje ara…',
+    favorites: 'Favoriler',
+    recent: 'Son açılanlar',
+    results: 'Sonuçlar',
+    none: 'Eşleşen proje yok.',
+    empty: 'Favori ya da son açılan proje yok.',
+    expand: 'Büyük pencereye dön',
+    launch: 'Başlat',
+    openEditor: 'Editörde aç',
+    linkedTo: '{name} projesine bağlı',
+    openTasks: '{count} açık görev'
   },
   nav: {
     addProject: 'Proje Ekle',

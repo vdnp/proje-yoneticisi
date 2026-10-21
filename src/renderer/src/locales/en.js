@@ -24,7 +24,28 @@ export default {
     close: 'Close',
     minimize: 'Minimize',
     maximize: 'Maximize',
-    restore: 'Restore'
+    restore: 'Restore',
+    back: 'Back',
+    forward: 'Forward',
+    location: 'Location',
+    darkTheme: 'Switch to dark theme',
+    lightTheme: 'Switch to light theme',
+    alwaysOnTop: 'Always on top',
+    mini: 'Mini window'
+  },
+  mini: {
+    search: 'Search projects…',
+    favorites: 'Favorites',
+    recent: 'Recently opened',
+    results: 'Results',
+    none: 'No matching projects.',
+    empty: 'No favorite or recently opened projects.',
+    expand: 'Back to the full window',
+    launch: 'Launch',
+    openEditor: 'Open in editor',
+    linkedTo: 'Linked to {name}',
+    openTasks_one: '{count} open task',
+    openTasks_other: '{count} open tasks'
   },
   nav: {
     addProject: 'Add project',

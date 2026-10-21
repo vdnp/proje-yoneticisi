@@ -1,76 +1,117 @@
 import { useEffect, useState } from 'react'
-import Logo from './Logo.jsx'
+import { ArrowLeft, ArrowRight, ChevronRight, Moon, Sun, Pin, PictureInPicture } from './Icons.jsx'
+import WindowControls from './WindowControls.jsx'
+import { cn } from '../lib/utils.js'
 import api from '../lib/api.js'
 import { useI18n } from '../lib/i18n.js'
+import useStore from '../store/useStore.js'
 
-// Frameless-window title bar, macOS style: traffic-light controls on the left,
-// centered title. The strip is a drag region; controls opt out with no-drag.
+// Frameless-window title bar: back/forward and the current location on the
+// left, quick toggles and the window controls on the right. The strip is a
+// drag region; every control opts out with no-drag. Nothing here may sit on
+// top of a control: Electron's drag regions ignore pointer-events, so an
+// overlapping drag area would swallow the control's clicks.
 const drag = { WebkitAppRegion: 'drag' }
 const noDrag = { WebkitAppRegion: 'no-drag' }
 
-const glyphs = {
-  close: (
-    <path d="M2 2l4 4M6 2l-4 4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-  ),
-  min: <line x1="1.5" y1="4" x2="6.5" y2="4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />,
-  max: (
-    <>
-      <path d="M2 2.4L2 5L4.6 2z" fill="currentColor" />
-      <path d="M6 5.6L6 3L3.4 6z" fill="currentColor" />
-    </>
-  )
-}
-
-function Light({ color, glyph, onClick, title }) {
+function BarButton({ title, onClick, disabled, active, children }) {
   return (
     <button
       title={title}
       aria-label={title}
+      aria-pressed={active}
+      disabled={disabled}
       onClick={onClick}
-      style={{ ...noDrag, backgroundColor: color }}
-      className="grid h-3 w-3 place-items-center rounded-full ring-1 ring-inset ring-black/15 transition active:brightness-90"
+      style={noDrag}
+      className={cn(
+        'grid h-7 w-7 place-items-center rounded-lg transition',
+        active ? 'bg-brand/15 text-brand' : 'text-content-faint hover:bg-surface-hover hover:text-content-primary',
+        disabled && 'pointer-events-none opacity-35'
+      )}
     >
-      <svg width="8" height="8" viewBox="0 0 8 8" className="text-black/55 opacity-0 transition group-hover:opacity-100">
-        {glyph}
-      </svg>
+      {children}
     </button>
   )
 }
 
-export default function TitleBar() {
-  const [maximized, setMaximized] = useState(false)
+// One location segment: earlier ones are links back, the last one is the
+// current page, tinted with its color (group / project) when it has one.
+function Crumb({ crumb, current }) {
+  const tint = crumb.color
+  return (
+    <button
+      onClick={current ? undefined : crumb.onClick}
+      disabled={current || !crumb.onClick}
+      style={{
+        ...noDrag,
+        ...(current && tint
+          ? { backgroundColor: `color-mix(in srgb, ${tint} 16%, transparent)`, '--pm': tint }
+          : null)
+      }}
+      className={cn(
+        'inline-flex max-w-[260px] items-center gap-1.5 truncate rounded-full border px-2.5 py-0.5 text-xs font-medium transition',
+        current
+          ? cn('border-transparent', tint ? 'pm-mark' : 'bg-brand/15 text-brand')
+          : 'border-surface-border text-content-secondary hover:border-brand/40 hover:text-content-primary'
+      )}
+    >
+      {tint && <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: tint }} />}
+      <span className="truncate">{crumb.label}</span>
+    </button>
+  )
+}
+
+export default function TitleBar({ crumbs = [], canBack, canForward, onBack, onForward }) {
+  const theme = useStore((s) => s.settings.theme)
+  const updateSettings = useStore((s) => s.updateSettings)
+  const [onTop, setOnTop] = useState(false)
   const { t } = useI18n()
 
   useEffect(() => {
-    if (!api.isElectron) return
-    api.windowIsMaximized().then(setMaximized)
-    return api.onWindowMaximize(setMaximized)
+    if (api.isAlwaysOnTop) api.isAlwaysOnTop().then(setOnTop)
   }, [])
+
+  const toggleOnTop = async () => setOnTop(await api.setAlwaysOnTop(!onTop))
+  const isLight = theme === 'light'
 
   return (
     <div
       style={drag}
-      className="pm-glass relative flex h-8 shrink-0 select-none items-center border-b border-surface-border bg-surface-bg"
+      className="pm-glass relative flex h-10 shrink-0 select-none items-center gap-3 border-b border-surface-border bg-surface-bg pl-2"
     >
-      {/* centered title. Kept clear of the traffic lights (left-24/right-24):
-          Electron's drag regions ignore pointer-events, so a drag area that
-          overlaps the buttons swallows their clicks (Windows treats them as
-          title-bar clicks and the page never sees them). */}
-      <div className="pointer-events-none absolute inset-y-0 left-24 right-24 flex items-center justify-center gap-2">
-        <Logo size={15} />
-        <span className="text-xs font-semibold text-content-secondary">{t('app.name')}</span>
+      <div className="flex items-center gap-0.5">
+        <BarButton title={`${t('titlebar.back')} (Alt+←)`} onClick={onBack} disabled={!canBack}>
+          <ArrowLeft size={16} />
+        </BarButton>
+        <BarButton title={`${t('titlebar.forward')} (Alt+→)`} onClick={onForward} disabled={!canForward}>
+          <ArrowRight size={16} />
+        </BarButton>
       </div>
 
-      {/* traffic lights (left) */}
-      <div className="group flex items-center gap-2 pl-3.5">
-        <Light color="#ff5f57" glyph={glyphs.close} onClick={() => api.windowClose()} title={t('titlebar.close')} />
-        <Light color="#febc2e" glyph={glyphs.min} onClick={() => api.windowMinimize()} title={t('titlebar.minimize')} />
-        <Light
-          color="#28c840"
-          glyph={glyphs.max}
-          onClick={() => api.windowMaximizeToggle()}
-          title={maximized ? t('titlebar.restore') : t('titlebar.maximize')}
-        />
+      <nav aria-label={t('titlebar.location')} className="flex min-w-0 items-center gap-1">
+        {crumbs.map((c, i) => (
+          <span key={c.key} className="flex min-w-0 items-center gap-1">
+            {i > 0 && <ChevronRight size={13} className="shrink-0 text-content-faint" />}
+            <Crumb crumb={c} current={i === crumbs.length - 1} />
+          </span>
+        ))}
+      </nav>
+
+      <div className="ml-auto flex h-full items-center gap-0.5">
+        <BarButton
+          title={isLight ? t('titlebar.darkTheme') : t('titlebar.lightTheme')}
+          onClick={() => updateSettings({ theme: isLight ? 'dark' : 'light' })}
+        >
+          {isLight ? <Moon size={15} /> : <Sun size={15} />}
+        </BarButton>
+        <BarButton title={t('titlebar.alwaysOnTop')} onClick={toggleOnTop} active={onTop}>
+          <Pin size={15} fill={onTop ? 'currentColor' : 'none'} />
+        </BarButton>
+        <BarButton title={t('titlebar.mini')} onClick={() => api.openMini()}>
+          <PictureInPicture size={15} />
+        </BarButton>
+        <span className="mx-1.5 h-4 w-px bg-surface-border" aria-hidden="true" />
+        <WindowControls />
       </div>
     </div>
   )

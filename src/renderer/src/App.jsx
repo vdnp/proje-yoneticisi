@@ -13,6 +13,7 @@ import DialogHost from './components/DialogHost.jsx'
 import UndoToast from './components/UndoToast.jsx'
 import { Folder } from './components/Icons.jsx'
 import { todoProgress, samePath } from './lib/utils.js'
+import { projectColorHex, groupColorHex } from './lib/groups.js'
 import { useI18n } from './lib/i18n.js'
 import { refreshGitStatuses } from './lib/useGitStatus.js'
 import api from './lib/api.js'
@@ -27,7 +28,23 @@ export default function App() {
   const { t, lang } = useI18n()
 
   // Simple in-memory router: { name: 'home'|'detail'|'tasks'|'settings', projectId }
-  const [route, setRoute] = useState({ name: 'home' })
+  // Simple in-memory router with back/forward history (title bar arrows,
+  // Alt+←/→, mouse back/forward buttons).
+  const [hist, setHist] = useState({ stack: [{ name: 'home' }], index: 0 })
+  const route = hist.stack[hist.index]
+  const setRoute = useCallback((next) => {
+    setHist((h) => {
+      const cur = h.stack[h.index]
+      if (cur.name === next.name && cur.projectId === next.projectId) return h
+      const stack = [...h.stack.slice(0, h.index + 1), next].slice(-50)
+      return { stack, index: stack.length - 1 }
+    })
+  }, [])
+  const goBack = useCallback(() => setHist((h) => (h.index > 0 ? { ...h, index: h.index - 1 } : h)), [])
+  const goForward = useCallback(
+    () => setHist((h) => (h.index < h.stack.length - 1 ? { ...h, index: h.index + 1 } : h)),
+    []
+  )
   const [filter, setFilter] = useState('all') // 'all' | 'favorites' | 'group:<id>'
   const [adding, setAdding] = useState(false)
   const [scanning, setScanning] = useState(false)
@@ -85,11 +102,26 @@ export default function App() {
     return api.onOpenPalette(() => setPaletteOpen(true))
   }, [])
 
+  // Mouse back / forward buttons.
+  useEffect(() => {
+    const onMouse = (e) => {
+      if (e.button === 3) goBack()
+      else if (e.button === 4) goForward()
+    }
+    window.addEventListener('mouseup', onMouse)
+    return () => window.removeEventListener('mouseup', onMouse)
+  }, [goBack, goForward])
+
   // ---- global shortcuts ----
   useEffect(() => {
     const onKey = (e) => {
       const mod = e.ctrlKey || e.metaKey
       const key = e.key.toLowerCase()
+
+      if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault()
+        return e.key === 'ArrowLeft' ? goBack() : goForward()
+      }
 
       if (mod && key === 'k') {
         e.preventDefault()
@@ -109,7 +141,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [modalOpen, route.name])
+  }, [modalOpen, route.name, setRoute, goBack, goForward])
 
   // ---- drag & drop folders onto the window ----
   const addFromPath = useCallback(
@@ -169,6 +201,26 @@ export default function App() {
     }
   }, [addFromPath])
 
+  // Title bar location, e.g. "All projects › acme-dashboard".
+  const groups = useStore((s) => s.groups)
+  const crumbs = useMemo(() => {
+    const goHome = () => setRoute({ name: 'home' })
+    const group = filter.startsWith('group:') ? groups.find((g) => g.id === filter.slice(6)) : null
+    const homeCrumb = {
+      key: 'home',
+      label: group ? group.name : filter === 'favorites' ? t('nav.favorites') : t('nav.all'),
+      color: group ? groupColorHex(group.color) : null,
+      onClick: goHome
+    }
+    if (route.name === 'tasks') return [{ key: 'tasks', label: t('nav.tasks') }]
+    if (route.name === 'settings') return [{ key: 'settings', label: t('nav.settings') }]
+    if (route.name === 'detail') {
+      const p = projects.find((x) => x.id === route.projectId)
+      return p ? [homeCrumb, { key: p.id, label: p.name, color: projectColorHex(p, groups) || null }] : [homeCrumb]
+    }
+    return [homeCrumb]
+  }, [route, filter, groups, projects, t, setRoute])
+
   const counts = useMemo(
     () => ({
       all: projects.length,
@@ -188,7 +240,13 @@ export default function App() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <TitleBar />
+      <TitleBar
+        crumbs={crumbs}
+        canBack={hist.index > 0}
+        canForward={hist.index < hist.stack.length - 1}
+        onBack={goBack}
+        onForward={goForward}
+      />
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar

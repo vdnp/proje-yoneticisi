@@ -71,6 +71,15 @@ export const Settings = make(
   </>
 )
 export const ArrowLeft = make(<path d="M19 12H5m6-7-7 7 7 7" />)
+export const ArrowRight = make(<path d="M5 12h14m-6-7 7 7-7 7" />)
+export const ChevronRight = make(<path d="m9 6 6 6-6 6" />)
+export const PictureInPicture = make(
+  <>
+    <path d="M11 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4" />
+    <rect x="14" y="14" width="7" height="6" rx="1.2" />
+  </>
+)
+export const Maximize = make(<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />)
 export const Trash = make(
   <>
     <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-12" />

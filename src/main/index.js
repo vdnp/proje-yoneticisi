@@ -19,6 +19,7 @@ import { setLanguage, t } from './i18n.js'
 import { trayIcon32 } from './trayIcon.js'
 
 let mainWindow = null
+let miniWindow = null
 let splashWindow = null
 let tray = null
 let currentShortcut = ''
@@ -171,11 +172,64 @@ function createWindow() {
     if (isSafeExternal(url)) shell.openExternal(url)
   })
 
+  loadRenderer(mainWindow)
+}
+
+// Load the renderer into a window; `hash` picks the view (#mini).
+function loadRenderer(win, hash = '') {
   if (process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    win.loadURL(process.env['ELECTRON_RENDERER_URL'] + (hash ? '#' + hash : ''))
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    win.loadFile(join(__dirname, '../renderer/index.html'), hash ? { hash } : undefined)
   }
+}
+
+// ---- Mini window ----------------------------------------------------------
+// A small always-on-top launcher (search + favorites / recents). It only
+// reads data: the main window stays the single writer, so the mini window
+// asks it to record opens (project:opened) instead of saving itself.
+
+function openMiniWindow() {
+  if (miniWindow && !miniWindow.isDestroyed()) {
+    miniWindow.show()
+    miniWindow.focus()
+    return
+  }
+  const b = mainWindow && !mainWindow.isDestroyed() ? mainWindow.getBounds() : null
+  miniWindow = new BrowserWindow({
+    width: 340,
+    height: 500,
+    minWidth: 300,
+    minHeight: 320,
+    x: b ? b.x + b.width - 360 : undefined,
+    y: b ? b.y + 48 : undefined,
+    show: false,
+    frame: false,
+    alwaysOnTop: true,
+    backgroundColor: '#0b0d12',
+    title: t('appName'),
+    icon: existsSync(ICON_PATH) ? ICON_PATH : undefined,
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: true,
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  })
+  miniWindow.once('ready-to-show', () => miniWindow && miniWindow.show())
+  miniWindow.on('closed', () => {
+    miniWindow = null
+    // Without the tray to come back from, don't leave the app running unseen.
+    if (!minimizeToTray && mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) showMainWindow()
+  })
+  miniWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  miniWindow.webContents.on('will-navigate', (e, url) => {
+    const devUrl = process.env['ELECTRON_RENDERER_URL']
+    if (devUrl && url.startsWith(devUrl)) return
+    e.preventDefault()
+  })
+  loadRenderer(miniWindow, 'mini')
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.hide()
 }
 
 function showMainWindow() {
@@ -387,6 +441,8 @@ function registerIpc() {
   ipcMain.handle('data:load', () => loadData())
   ipcMain.handle('data:save', (_e, data) => {
     const res = saveData(data)
+    // Keep the mini window's read-only copy current.
+    if (miniWindow && !miniWindow.isDestroyed()) miniWindow.webContents.send('data:changed', data)
     setLanguage(data?.settings?.language)
     refreshTray(data)
     return res
@@ -505,6 +561,29 @@ function registerIpc() {
   })
   ipcMain.on('window:close', () => mainWindow && mainWindow.close())
   ipcMain.handle('window:isMaximized', () => !!(mainWindow && mainWindow.isMaximized()))
+
+  // "Always on top" for whichever window asks (title bar pin / mini window).
+  ipcMain.handle('window:setAlwaysOnTop', (e, on) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    if (!win) return false
+    win.setAlwaysOnTop(!!on)
+    return win.isAlwaysOnTop()
+  })
+  ipcMain.handle('window:isAlwaysOnTop', (e) => !!BrowserWindow.fromWebContents(e.sender)?.isAlwaysOnTop())
+
+  ipcMain.on('mini:open', () => openMiniWindow())
+  ipcMain.on('mini:expand', () => {
+    showMainWindow()
+    if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close()
+  })
+  ipcMain.on('mini:close', () => {
+    if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close()
+  })
+  // Opens done from the mini window are recorded by the main window.
+  ipcMain.on('mini:opened', (_e, ids) => {
+    if (!mainWindow || mainWindow.isDestroyed() || !Array.isArray(ids)) return
+    for (const id of ids) if (typeof id === 'string') mainWindow.webContents.send('project:opened', id)
+  })
 }
 
 function registerGlobalShortcut(accelerator) {

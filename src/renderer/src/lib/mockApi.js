@@ -424,6 +424,13 @@ const mockApi = {
   windowMaximizeToggle: () => {},
   windowClose: () => {},
   windowIsMaximized: async () => false,
+  setAlwaysOnTop: async (on) => !!on,
+  isAlwaysOnTop: async () => false,
+  openMini: () => window.open(location.pathname + location.search + '#mini', 'mini', 'width=340,height=500'),
+  expandMini: () => window.close(),
+  closeMini: () => window.close(),
+  notifyOpened: () => {},
+  onDataChanged: () => () => {},
   onWindowMaximize: () => () => {},
 
   getPathForFile: () => '',
