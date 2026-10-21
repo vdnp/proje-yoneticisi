@@ -46,7 +46,7 @@ Herhangi bir projeyi tek tuşla bul, editöründe aç; git durumunu ve görevler
 
 Kurulum dosyası kod imzalı değil, bu yüzden Windows SmartScreen bilinmeyen yayımcı uyarısı verir. **Daha fazla bilgi → Yine de çalıştır**'ı seç. Her kurulum dosyası bu deponun kaynak kodundan GitHub Actions ile derlenir; ayrıntılar için [kod imzalama ve gizlilik](CODE_SIGNING.md).
 
-Kurulum dosyasıyla yüklediysen güncellemek için yeni sürümü eskisinin üzerine kur. Projelerin korunur, çünkü uygulama verilerini kurulum klasörünün dışında tutar (bkz. [Verilerin](#verilerin)). Store sürümü verilerini ayrı bir yerde tutar; projelerini ikisi arasında taşımak için **Ayarlar → Yedekleme** ile dışa aktarıp içe aktar.
+Kurulum dosyasıyla yüklediysen güncellemek için yeni sürümü eskisinin üzerine kur. Yeni sürüm çıktığını **Ayarlar → Güncellemeler** bölümünden görebilirsin: **Şimdi denetle**'ye bas ya da **Otomatik denetle**'yi aç (varsayılan olarak kapalı; bkz. [gizlilik politikası](CODE_SIGNING.md#privacy-policy)). Projelerin korunur, çünkü uygulama verilerini kurulum klasörünün dışında tutar (bkz. [Verilerin](#verilerin)). Store sürümü verilerini ayrı bir yerde tutar; projelerini ikisi arasında taşımak için **Ayarlar → Yedekleme** ile dışa aktarıp içe aktar.
 
 ## Klavye kısayolları
 

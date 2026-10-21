@@ -57,6 +57,20 @@ export default function App() {
     return () => window.removeEventListener('focus', onFocus)
   }, [checkMissing])
 
+  // Opt-in automatic update check: shortly after start, then once a day
+  // (the app can sit in the tray for days).
+  const checkUpdates = useStore((s) => !!s.settings.checkUpdates)
+  useEffect(() => {
+    if (!loaded || !checkUpdates) return
+    const check = () => useStore.getState().checkUpdate()
+    const first = setTimeout(check, 5000)
+    const daily = setInterval(check, 24 * 60 * 60 * 1000)
+    return () => {
+      clearTimeout(first)
+      clearInterval(daily)
+    }
+  }, [loaded, checkUpdates])
+
   // The tray can launch a project directly; mirror that into open stats.
   useEffect(() => {
     if (!api.onProjectOpened) return

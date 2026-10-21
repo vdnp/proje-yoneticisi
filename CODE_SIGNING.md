@@ -10,4 +10,6 @@ Every installer is built by GitHub Actions from the source code in this reposito
 
 This program will not transfer any information to other networked systems unless specifically requested by the user.
 
-All of its data (the project list, notes, tasks and settings) is stored locally in `%APPDATA%\project-manager\data.json`. The app has no accounts, telemetry, analytics or update checks. The only network traffic comes from things the user asks for: links they open in their browser, and `https` images embedded in a project's README when they view it.
+All of its data (the project list, notes, tasks and settings) is stored locally in `%APPDATA%\project-manager\data.json`. The app has no accounts, telemetry or analytics. The only network traffic comes from things the user asks for: links they open in their browser, `https` images embedded in a project's README when they view it, and update checks.
+
+An update check asks GitHub's public API for the latest release number. It only happens when the user clicks **Check now** in Settings, or once a day if they turn on **Check automatically** (off by default). GitHub sees the request's IP address and the app version; nothing else is sent. The Microsoft Store version never checks, since the Store updates it.

@@ -271,6 +271,16 @@ const mockApi = {
   },
   getDataPath: async () => L('(tarayıcı önizlemesi — localStorage)', '(browser preview — localStorage)'),
   getAppVersion: async () => 'web-preview',
+  checkUpdate: async () => {
+    const newer = new URLSearchParams(window.location.search).get('update') === '1'
+    return {
+      ok: true,
+      current: '1.4.0',
+      latest: newer ? '1.5.0' : '1.4.0',
+      newer,
+      url: 'https://github.com/vdnp/proje-yoneticisi/releases/latest'
+    }
+  },
   // `?store=1` previews the Microsoft Store build's settings.
   getAppInfo: async () => ({
     version: 'web-preview',

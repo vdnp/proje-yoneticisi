@@ -26,6 +26,9 @@ const useStore = create((set, get) => ({
   // path -> true for projects whose folder can't be found. Derived from the
   // disk on load / window focus, never persisted.
   missing: {},
+  // Result of the last update check ({ ok, latest, newer, url, error,
+  // checkedAt }) or null. Never persisted.
+  update: null,
 
   // ---- lifecycle ----
   init: async () => {
@@ -49,6 +52,12 @@ const useStore = create((set, get) => ({
     const missing = {}
     for (const p of paths) if (exists[p] === false) missing[p] = true
     set({ missing })
+  },
+
+  checkUpdate: async () => {
+    const res = await api.checkUpdate()
+    set({ update: { ...res, checkedAt: Date.now() } })
+    return res
   },
 
   // ---- backup import ----

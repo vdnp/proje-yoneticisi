@@ -1,10 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, globalShortcut, Tray, Menu, nativeImage } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, globalShortcut, Tray, Menu, nativeImage, net } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { spawn, execFile } from 'child_process'
 import { loadData, saveData, getDataFilePath } from './store.js'
 import { hydrate } from './schema.js'
 import { launchPlan } from '../shared/links.js'
+import { parseVersion, isNewer } from './version.js'
 import {
   inspectFolder,
   getScripts,
@@ -345,6 +346,41 @@ async function runLaunchPlan(plan) {
   return results
 }
 
+// ---- Update check ----------------------------------------------------------
+
+const REPO = 'vdnp/proje-yoneticisi'
+
+// Asks GitHub's public API for the latest release. Only ever runs when the
+// user clicks "Check now" or has turned on automatic checks (off by default;
+// see the privacy policy in CODE_SIGNING.md). Nothing about the user's data is
+// sent. The Store version is updated by the Store, so it never checks.
+async function checkForUpdate() {
+  if (IS_STORE) return { ok: false, error: 'store' }
+  const current = app.getVersion()
+  try {
+    const res = await net.fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': `proje-yoneticisi/${current}`
+      },
+      signal: AbortSignal.timeout(10000)
+    })
+    if (!res.ok) return { ok: false, error: 'network' }
+    const latest = String((await res.json()).tag_name || '').replace(/^v/, '')
+    if (!parseVersion(latest)) return { ok: false, error: 'network' }
+    return {
+      ok: true,
+      current,
+      latest,
+      newer: isNewer(latest, current),
+      // Built from the validated version rather than taken from the response.
+      url: `https://github.com/${REPO}/releases/tag/v${latest}`
+    }
+  } catch {
+    return { ok: false, error: 'network' }
+  }
+}
+
 // ---- IPC registration -----------------------------------------------------
 
 function registerIpc() {
@@ -358,6 +394,7 @@ function registerIpc() {
   ipcMain.handle('data:path', () => getDataFilePath())
   ipcMain.handle('app:version', () => app.getVersion())
   ipcMain.handle('app:info', () => ({ version: app.getVersion(), store: IS_STORE }))
+  ipcMain.handle('app:checkUpdate', () => checkForUpdate())
   // A fixed ms-settings URI, so it bypasses the http(s)-only rule on purpose.
   ipcMain.handle('open:startupSettings', async () => {
     await shell.openExternal('ms-settings:startupapps')

@@ -9,6 +9,7 @@ const api = {
   getDataPath: () => ipcRenderer.invoke('data:path'),
   getAppVersion: () => ipcRenderer.invoke('app:version'),
   getAppInfo: () => ipcRenderer.invoke('app:info'),
+  checkUpdate: () => ipcRenderer.invoke('app:checkUpdate'),
   openStartupSettings: () => ipcRenderer.invoke('open:startupSettings'),
   exportData: (data) => ipcRenderer.invoke('data:export', data),
   importData: () => ipcRenderer.invoke('data:import'),

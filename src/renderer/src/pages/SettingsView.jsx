@@ -12,7 +12,7 @@ import {
   Upload,
   AlertTriangle
 } from '../components/Icons.jsx'
-import { cn, newId } from '../lib/utils.js'
+import { cn, newId, relativeTime } from '../lib/utils.js'
 import { ACCENT_LIST } from '../lib/theme.js'
 import { LANGUAGES, useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
@@ -82,7 +82,10 @@ export default function SettingsView({ onOpenProject }) {
   const replaceAll = useStore((s) => s.replaceAll)
   const mergeData = useStore((s) => s.mergeData)
   const checkMissing = useStore((s) => s.checkMissing)
-  const { t } = useI18n()
+  const update = useStore((s) => s.update)
+  const checkUpdate = useStore((s) => s.checkUpdate)
+  const { t, lang } = useI18n()
+  const [checking, setChecking] = useState(false)
 
   const [dataPath, setDataPath] = useState('')
   const [version, setVersion] = useState('')
@@ -478,6 +481,65 @@ export default function SettingsView({ onOpenProject }) {
               <p className="mt-3 break-all text-xs text-content-secondary" role="status">
                 {backupMsg}
               </p>
+            )}
+          </Section>
+
+          {/* Updates */}
+          <Section title={t('settings.updates')}>
+            {isStore ? (
+              <p className="text-sm text-content-secondary">{t('settings.updatesStore')}</p>
+            ) : (
+              <>
+                <Row
+                  first
+                  title={
+                    checking
+                      ? t('settings.updateChecking')
+                      : !update
+                        ? t('settings.updateNever')
+                        : !update.ok
+                          ? t('settings.updateFailed')
+                          : update.newer
+                            ? t('settings.updateAvailable', { latest: update.latest, current: update.current })
+                            : t('settings.updateUpToDate', { version: update.current })
+                  }
+                  desc={
+                    update && !checking
+                      ? t('settings.updateLastChecked', { time: relativeTime(update.checkedAt, lang) })
+                      : null
+                  }
+                >
+                  <div className="flex shrink-0 gap-2">
+                    {update?.newer && !checking && (
+                      <button
+                        onClick={() => api.openExternal(update.url)}
+                        className="flex shrink-0 items-center gap-2 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-onbrand hover:brightness-110"
+                      >
+                        <Download size={15} /> {t('settings.updateDownload')}
+                      </button>
+                    )}
+                    <button
+                      onClick={async () => {
+                        setChecking(true)
+                        await checkUpdate()
+                        setChecking(false)
+                      }}
+                      disabled={checking}
+                      className={secondaryBtn}
+                    >
+                      <RefreshCw size={15} className={checking ? 'animate-spin' : ''} />
+                      {t('settings.updateCheck')}
+                    </button>
+                  </div>
+                </Row>
+                <Row title={t('settings.updateAuto')} desc={t('settings.updateAutoDesc')}>
+                  <Toggle
+                    checked={!!settings.checkUpdates}
+                    onChange={(v) => updateSettings({ checkUpdates: v })}
+                    label={t('settings.updateAuto')}
+                  />
+                </Row>
+              </>
             )}
           </Section>
 

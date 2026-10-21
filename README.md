@@ -46,7 +46,7 @@ Find any project in a keystroke, open it in your editor, and see its git status 
 
 The installer is not code-signed, so Windows SmartScreen will warn about an unknown publisher. Choose **More info → Run anyway**. Every installer is built by GitHub Actions from this repository's source; see [code signing and privacy](CODE_SIGNING.md).
 
-To update the installer version, install the new version over the old one. Your projects are kept: the app stores its data outside the install folder (see [Your data](#your-data)). The Store version keeps its data separately; to move your projects between the two, use **Settings → Backup** to export and import.
+To update the installer version, install the new version over the old one. **Settings → Updates** tells you when a new version is out: click **Check now**, or turn on **Check automatically** (off by default; see the [privacy policy](CODE_SIGNING.md#privacy-policy)). Your projects are kept: the app stores its data outside the install folder (see [Your data](#your-data)). The Store version keeps its data separately; to move your projects between the two, use **Settings → Backup** to export and import.
 
 ## Keyboard shortcuts
 

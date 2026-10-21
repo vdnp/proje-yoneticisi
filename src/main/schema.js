@@ -24,7 +24,8 @@ export const DEFAULT_DATA = {
     autoLaunch: false,
     globalShortcut: 'CommandOrControl+Shift+P',
     viewMode: 'grid',
-    sort: 'modified' // 'modified' | 'opened' | 'name' | 'favorite' | 'custom'
+    sort: 'modified', // 'modified' | 'opened' | 'name' | 'favorite' | 'custom'
+    checkUpdates: false // daily update check; opt-in (privacy policy)
   }
 }
 

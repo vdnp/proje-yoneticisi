@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- **Update check** in Settings → Updates: shows whether a newer version is on GitHub, with a link to download it, and a small dot on Settings in the sidebar when there is one. Checks only when you click **Check now**, or once a day if you turn on **Check automatically** (off by default). The Microsoft Store version is updated by the Store and doesn't check.
+
 ## 1.4.0
 
 ### Added

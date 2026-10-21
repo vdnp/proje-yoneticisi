@@ -5,7 +5,7 @@ import { groupColorHex } from '../lib/groups.js'
 import { useI18n } from '../lib/i18n.js'
 import useStore from '../store/useStore.js'
 
-function NavItem({ active, onClick, icon: Icon, label, count, dot, onDropProject, onEdit, editLabel }) {
+function NavItem({ active, onClick, icon: Icon, label, count, dot, badge, onDropProject, onEdit, editLabel }) {
   const [over, setOver] = useState(false)
 
   return (
@@ -46,6 +46,9 @@ function NavItem({ active, onClick, icon: Icon, label, count, dot, onDropProject
           <Icon size={18} className={active ? 'text-brand' : ''} />
         )}
         <span className="truncate">{label}</span>
+        {badge && (
+          <span className="h-2 w-2 shrink-0 rounded-full bg-brand" title={badge} aria-label={badge} />
+        )}
       </button>
 
       {onEdit && (
@@ -83,6 +86,7 @@ export default function Sidebar({
   const projects = useStore((s) => s.projects)
   const groups = useStore((s) => s.groups)
   const setProjectGroup = useStore((s) => s.setProjectGroup)
+  const update = useStore((s) => s.update)
   const { t } = useI18n()
   const onHome = view === 'home'
 
@@ -166,6 +170,7 @@ export default function Sidebar({
           onClick={goSettings}
           icon={Settings}
           label={t('nav.settings')}
+          badge={update?.newer ? t('settings.updateAvailable', { latest: update.latest, current: update.current }) : null}
         />
         <div className="px-3 pt-1 text-[11px] leading-relaxed text-content-faint">
           {t('nav.projectCount', { count: counts.all })} ·{' '}
