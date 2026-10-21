@@ -2,7 +2,7 @@ import TagBadge from './TagBadge.jsx'
 import PackageManagerBadge from './PackageManagerBadge.jsx'
 import GitBadge from './GitBadge.jsx'
 import { Star, Pin, Code, Folder, Terminal, Github, CheckSquare, AlertTriangle, Play } from './Icons.jsx'
-import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle, ProjectMark } from './ProjectBits.jsx'
+import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle, GroupBadge } from './ProjectBits.jsx'
 import { isLaunchable } from '../../../shared/links.js'
 import { cn, relativeTime, todoProgress } from '../lib/utils.js'
 import { projectColorHex } from '../lib/groups.js'
@@ -126,11 +126,10 @@ export default function ProjectRow({
         </button>
       </div>
 
-      {cardColor === 'border' && <ProjectMark name={project.name} color={color} size={24} />}
-
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-semibold text-content-primary">{project.name}</span>
+          {cardColor === 'border' && <GroupBadge project={project} />}
           {project.gitUrl && <Github size={13} className="shrink-0 text-content-faint" />}
           <span className="min-w-0 shrink">
             <LinkChip linked={linked} />

@@ -3,6 +3,7 @@ import { cn } from '../lib/utils.js'
 import { useI18n } from '../lib/i18n.js'
 import useStore from '../store/useStore.js'
 import { linkedProjects } from '../../../shared/links.js'
+import { projectColorHex } from '../lib/groups.js'
 
 // Small pieces shared by ProjectCard and ProjectRow.
 
@@ -37,25 +38,20 @@ export function useLinked(project) {
   return linkedProjects(project, projects)
 }
 
-// Monogram tile before the name (the "border" card color): the project's
-// initial on a tint of its color, or neutral when it has none.
-export function ProjectMark({ name, color, size = 26 }) {
-  // Plain toUpperCase: project names are mostly English, where Turkish
-  // casing would turn "inventory" into "İ".
-  const initial = (String(name || '?').trim()[0] || '?').toUpperCase()
+// The project's group as a pill in the project color, next to the name (the
+// "border" card color). Nothing for projects without a group.
+export function GroupBadge({ project }) {
+  const groups = useStore((s) => s.groups)
+  const group = groups.find((g) => g.id === project.groupId)
+  if (!group) return null
+  const color = projectColorHex(project, groups)
   return (
     <span
       // Text color comes from .pm-mark (index.css) so light mode can deepen it.
-      className="pm-mark grid shrink-0 place-items-center rounded-lg text-[13px] font-semibold"
-      style={{
-        width: size,
-        height: size,
-        '--pm': color || 'rgb(var(--c-text-dim))',
-        backgroundColor: color ? `color-mix(in srgb, ${color} 20%, rgb(var(--c-card)))` : 'rgb(var(--c-hover))'
-      }}
-      aria-hidden="true"
+      className="pm-mark max-w-[45%] shrink-0 truncate rounded-full px-2 py-px text-[11px] font-medium"
+      style={{ '--pm': color, backgroundColor: `color-mix(in srgb, ${color} 16%, rgb(var(--c-card)))` }}
     >
-      {initial}
+      {group.name}
     </span>
   )
 }

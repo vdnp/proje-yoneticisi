@@ -14,7 +14,7 @@ import {
   Play,
   GitBranch
 } from './Icons.jsx'
-import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle, ProjectMark } from './ProjectBits.jsx'
+import { SelectBox, LinkChip, useLinked, launchTitle, dropStyle, GroupBadge } from './ProjectBits.jsx'
 import { isLaunchable } from '../../../shared/links.js'
 import { cn, relativeTime, todoProgress } from '../lib/utils.js'
 import { projectColorHex } from '../lib/groups.js'
@@ -187,9 +187,11 @@ export default function ProjectCard({
 
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
-          {cardColor === 'border' && <ProjectMark name={project.name} color={color} />}
           <div className="min-w-0">
-            <h3 className="truncate text-[15px] font-semibold text-content-primary">{project.name}</h3>
+            <div className="flex min-w-0 items-center gap-2">
+              <h3 className="truncate text-[15px] font-semibold text-content-primary">{project.name}</h3>
+              {cardColor === 'border' && <GroupBadge project={project} />}
+            </div>
             {layout === 'status' ? (
               <StatusLine project={project} missing={missing} />
             ) : (

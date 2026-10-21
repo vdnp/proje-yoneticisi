@@ -283,7 +283,7 @@ export default {
     cardColor: 'Kart rengi',
     cardColors: {
       strip: { name: 'Şerit', desc: 'Solda renk çizgisi' },
-      border: { name: 'Kenarlık', desc: 'Renkli kenar ve harf' },
+      border: { name: 'Kenarlık', desc: 'Renkli kenar, grup rozeti' },
       progress: { name: 'Görev çubuğu', desc: 'Altta görev ilerlemesi' }
     },
     cardLayout: 'Kart düzeni',

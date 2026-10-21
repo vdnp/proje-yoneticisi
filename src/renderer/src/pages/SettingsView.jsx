@@ -152,7 +152,8 @@ const CARD_GLYPHS = {
   strip: <span className="absolute inset-y-0 left-0 w-1 bg-brand" />,
   border: (
     <span className="absolute inset-0.5 rounded border border-brand/70">
-      <span className="absolute left-1 top-1 h-2.5 w-2.5 rounded-sm bg-brand/30" />
+      <span className="absolute left-1 top-1.5 h-1 w-3 rounded-full bg-content-secondary/60" />
+      <span className="absolute left-5 top-1 h-2 w-3.5 rounded-full bg-brand/40" />
     </span>
   ),
   progress: (

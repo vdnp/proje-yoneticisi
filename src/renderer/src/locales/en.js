@@ -294,7 +294,7 @@ export default {
     cardColor: 'Card color',
     cardColors: {
       strip: { name: 'Strip', desc: 'Color strip on the left' },
-      border: { name: 'Border', desc: 'Colored edge and initial' },
+      border: { name: 'Border', desc: 'Colored edge, group badge' },
       progress: { name: 'Task bar', desc: 'Task progress at the bottom' }
     },
     cardLayout: 'Card layout',
