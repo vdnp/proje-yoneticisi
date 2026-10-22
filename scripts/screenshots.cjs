@@ -72,6 +72,7 @@ async function capture(lang) {
 
   const suffix = lang === 'en' ? '' : `-${lang}`
   const tasksLabel = lang === 'en' ? 'All tasks' : 'Tüm Görevler'
+  const settingsLabel = lang === 'en' ? 'Settings' : 'Ayarlar'
 
   await shoot(win, `home${suffix}.png`)
 
@@ -84,6 +85,9 @@ async function capture(lang) {
 
   await run(win, clickText(tasksLabel))
   await shoot(win, `tasks${suffix}.png`)
+
+  await run(win, clickText(settingsLabel))
+  await shoot(win, `settings${suffix}.png`)
 
   win.destroy()
 }
