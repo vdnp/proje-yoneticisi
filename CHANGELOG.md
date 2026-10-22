@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.2
 
 ### Added
 - **New title bar.** Back / forward (also Alt+←/→ and the mouse's back and forward buttons), the current location as clickable chips tinted with the group or project color, and quick buttons for the theme, "always on top" and the mini window. The window buttons have their own design: a line, two corner brackets and a cross, with an accent underline on hover.
