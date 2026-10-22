@@ -344,7 +344,9 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
   return (
     <div className="h-full overflow-y-auto">
       {/* top bar */}
-      <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-surface-border bg-surface-bg/90 px-6 py-3 backdrop-blur">
+      {/* Plain bg-surface-bg + pm-glass, like the other bars, so each style
+          (e.g. Glass: translucent and blurred) applies to it too. */}
+      <div className="pm-glass sticky top-0 z-10 flex items-center gap-3 border-b border-surface-border bg-surface-bg px-6 py-3">
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-content-secondary transition hover:bg-surface-hover hover:text-content-primary"

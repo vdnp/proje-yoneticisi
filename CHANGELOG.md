@@ -6,6 +6,9 @@
 - **New title bar.** Back / forward (also Alt+←/→ and the mouse's back and forward buttons), the current location as clickable chips tinted with the group or project color, and quick buttons for the theme, "always on top" and the mini window. The window buttons have their own design: a line, two corner brackets and a cross, with an accent underline on hover.
 - **Mini window.** A small always-on-top launcher with search, favorites and recently opened projects; each project's linked projects are listed indented under it. Enter launches (or opens in the editor), Shift+Enter opens the editor only.
 
+### Fixed
+- The bar at the top of a project page (with "Back") ignored the Glass style and stayed opaque.
+
 ## 1.4.1
 
 ### Added
