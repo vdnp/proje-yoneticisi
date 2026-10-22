@@ -46,7 +46,10 @@ async function capture(lang) {
     height: 800,
     useContentSize: true,
     backgroundColor: '#0b0d12',
-    webPreferences: { backgroundThrottling: false }
+    // Offscreen rendering: a hidden window can hand capturePage a stale frame
+    // after the page changes; offscreen windows always paint. Scale 1.25 gives
+    // 1600×1000 images (the Microsoft Store wants at least 1366×768).
+    webPreferences: { backgroundThrottling: false, offscreen: { deviceScaleFactor: 1.25 } }
   })
   // The dev server occasionally aborts the very first navigation of a fresh
   // window (ERR_FAILED); a short retry is enough.
