@@ -30,6 +30,7 @@ import { useProjectActions } from '../lib/useProjectActions.js'
 import { useGitStatus } from '../lib/useGitStatus.js'
 import { useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
+import { canRunScripts } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
 import { showAlert } from '../lib/dialogs.js'
 
@@ -169,7 +170,9 @@ function LinksCard({ project, scripts, onOpenProject }) {
       <h3 className="flex items-center gap-2 text-sm font-semibold text-content-primary">
         <Link size={16} /> {t('detail.links')}
       </h3>
-      <p className="mt-1 text-xs leading-relaxed text-content-faint">{t('detail.linksHint')}</p>
+      <p className="mt-1 text-xs leading-relaxed text-content-faint">
+        {t(canRunScripts ? 'detail.linksHint' : 'detail.linksHintNoScripts')}
+      </p>
 
       <div className="mt-3 flex flex-col gap-1.5">
         {linked.length === 0 && (
@@ -188,14 +191,16 @@ function LinksCard({ project, scripts, onOpenProject }) {
               </span>
               <span className="block truncate text-[11px] text-content-faint">{p.path}</span>
             </button>
-            <span
-              className={cn(
-                'shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-medium',
-                p.startScript ? 'bg-emerald-500/10 text-emerald-400' : 'text-content-faint'
-              )}
-            >
-              {p.startScript ? `▶ ${p.startScript}` : t('detail.noStartScript')}
-            </span>
+            {canRunScripts && (
+              <span
+                className={cn(
+                  'shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-medium',
+                  p.startScript ? 'bg-emerald-500/10 text-emerald-400' : 'text-content-faint'
+                )}
+              >
+                {p.startScript ? `▶ ${p.startScript}` : t('detail.noStartScript')}
+              </span>
+            )}
             <button
               onClick={() => unlinkProjects(project.id, p.id)}
               title={t('detail.unlink')}
@@ -222,27 +227,29 @@ function LinksCard({ project, scripts, onOpenProject }) {
           />
         )}
 
-        <div className="flex items-center gap-2">
-          <span className="text-content-secondary">{t('detail.startScript')}:</span>
-          {scriptNames.length || project.startScript ? (
-            <Select
-              size="sm"
-              value={project.startScript || ''}
-              onChange={(v) => updateProject(project.id, { startScript: v })}
-              label={t('detail.startScript')}
-              menuWidth={240}
-              options={[
-                { value: '', label: t('detail.startScriptNone') },
-                ...scriptNames.map((name) => ({ value: name, label: name, hint: scripts[name] })),
-                ...(missingStart
-                  ? [{ value: project.startScript, label: t('detail.startScriptMissing', { script: project.startScript }) }]
-                  : [])
-              ]}
-            />
-          ) : (
-            <span className="text-xs text-content-faint">{t('detail.noScriptsForStart')}</span>
-          )}
-        </div>
+        {canRunScripts && (
+          <div className="flex items-center gap-2">
+            <span className="text-content-secondary">{t('detail.startScript')}:</span>
+            {scriptNames.length || project.startScript ? (
+              <Select
+                size="sm"
+                value={project.startScript || ''}
+                onChange={(v) => updateProject(project.id, { startScript: v })}
+                label={t('detail.startScript')}
+                menuWidth={240}
+                options={[
+                  { value: '', label: t('detail.startScriptNone') },
+                  ...scriptNames.map((name) => ({ value: name, label: name, hint: scripts[name] })),
+                  ...(missingStart
+                    ? [{ value: project.startScript, label: t('detail.startScriptMissing', { script: project.startScript }) }]
+                    : [])
+                ]}
+              />
+            ) : (
+              <span className="text-xs text-content-faint">{t('detail.noScriptsForStart')}</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -498,7 +505,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
 
         {/* actions */}
         <div className="mt-5 flex flex-wrap gap-2">
-          {isLaunchable(project) && (
+          {isLaunchable(project, canRunScripts) && (
             <ActionBtn
               icon={Play}
               label={t('detail.actions.launch')}
@@ -509,7 +516,7 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
           <ActionBtn
             icon={Code}
             label={t('detail.actions.openEditor')}
-            tone={isLaunchable(project) ? 'default' : 'primary'}
+            tone={isLaunchable(project, canRunScripts) ? 'default' : 'primary'}
             onClick={() => actions.openInEditor(project)}
           />
           <ActionBtn
@@ -624,8 +631,8 @@ export default function ProjectDetail({ projectId, onBack, onOpenProject }) {
 
         <LinksCard project={project} scripts={scripts} onOpenProject={onOpenProject} />
 
-        {/* package.json scripts */}
-        {Object.keys(scripts).length > 0 && (
+        {/* package.json scripts (not runnable on macOS yet) */}
+        {canRunScripts && Object.keys(scripts).length > 0 && (
           <div className="mt-6 rounded-2xl border border-surface-border bg-surface-card p-4">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-content-primary">

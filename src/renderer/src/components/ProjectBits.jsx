@@ -1,6 +1,7 @@
 import { Check, Link } from './Icons.jsx'
 import { cn } from '../lib/utils.js'
 import { useI18n } from '../lib/i18n.js'
+import { KEYS, canRunScripts } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
 import { linkedProjects } from '../../../shared/links.js'
 import { projectColorHex } from '../lib/groups.js'
@@ -14,8 +15,8 @@ export function SelectBox({ checked, visible, onToggle }) {
     <button
       role="checkbox"
       aria-checked={checked}
-      title={t('card.select')}
-      aria-label={t('card.select')}
+      title={t('card.select', KEYS)}
+      aria-label={t('card.select', KEYS)}
       onClick={(e) => {
         e.stopPropagation()
         onToggle(e)
@@ -75,7 +76,9 @@ export function LinkChip({ linked }) {
 
 // Tooltip for the Launch button: what will open and which scripts start.
 export function launchTitle(t, project, linked) {
-  const parts = [project, ...linked].map((p) => (p.startScript ? `${p.name} (${p.startScript})` : p.name))
+  const parts = [project, ...linked].map((p) =>
+    canRunScripts && p.startScript ? `${p.name} (${p.startScript})` : p.name
+  )
   return t('card.launchTitle', { what: parts.join(' + ') })
 }
 

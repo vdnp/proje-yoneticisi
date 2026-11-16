@@ -17,6 +17,33 @@ import {
 import { getLastCommit, getGitStatus } from './git.js'
 import { setLanguage, t } from './i18n.js'
 import { trayIcon32 } from './trayIcon.js'
+import { trayTemplate16, trayTemplate32 } from './trayTemplateIcon.js'
+import {
+  editorSpec,
+  editorFallbackSpec,
+  commandExistsSpec,
+  terminalSpecs,
+  scriptSpec,
+  loginShellPathSpec,
+  parseLoginShellPath,
+  mergePath
+} from './launchers.js'
+
+const PLATFORM = process.platform
+const IS_WIN = PLATFORM === 'win32'
+const IS_MAC = PLATFORM === 'darwin'
+
+// Windows: frameless, the renderer draws its own minimize/maximize/close.
+// macOS: the title bar is hidden but the native traffic lights stay, placed
+// to sit centered in the app's 40px title bar.
+// Starting package.json scripts in a terminal isn't supported on macOS yet:
+// there "Launch" only opens the editors. The renderer hides the script
+// controls; the checks here are the backstop.
+const CAN_RUN_SCRIPTS = !IS_MAC
+
+const MAIN_WINDOW_CHROME = IS_MAC
+  ? { titleBarStyle: 'hidden', trafficLightPosition: { x: 14, y: 13 } }
+  : { frame: false }
 
 let mainWindow = null
 let miniWindow = null
@@ -121,7 +148,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     show: false,
-    frame: false,
+    ...MAIN_WINDOW_CHROME,
     backgroundColor: '#0b0d12',
     autoHideMenuBar: true,
     title: t('appName'),
@@ -156,6 +183,9 @@ function createWindow() {
   // Keep the custom title bar's maximize/restore icon in sync.
   mainWindow.on('maximize', () => mainWindow.webContents.send('window:maximized', true))
   mainWindow.on('unmaximize', () => mainWindow.webContents.send('window:maximized', false))
+  // The macOS title bar makes room for the traffic lights only outside full screen.
+  mainWindow.on('enter-full-screen', () => mainWindow.webContents.send('window:fullscreen', true))
+  mainWindow.on('leave-full-screen', () => mainWindow.webContents.send('window:fullscreen', false))
 
   // New windows (target=_blank) go to the real browser, never a child window.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -233,7 +263,8 @@ function openMiniWindow() {
 }
 
 function showMainWindow() {
-  if (!mainWindow) return createWindow()
+  // Destroyed: on macOS the app keeps running after its window is closed.
+  if (!mainWindow || mainWindow.isDestroyed()) return createWindow()
   if (mainWindow.isMinimized()) mainWindow.restore()
   mainWindow.show()
   mainWindow.focus()
@@ -246,7 +277,7 @@ function showMainWindow() {
 // (lastOpenedAt / openCount) so stats stay accurate.
 async function openProjectFromTray(project, data) {
   // Without links or a launch script the plan is just this project's editor.
-  const plan = launchPlan(project, data.projects || [], data.settings?.defaultEditor)
+  const plan = launchPlan(project, data.projects || [], data.settings?.defaultEditor, CAN_RUN_SCRIPTS)
   const results = await runLaunchPlan(plan)
   if (mainWindow && !mainWindow.isDestroyed()) {
     for (const r of results) if (r.ok) mainWindow.webContents.send('project:opened', r.id)
@@ -301,11 +332,108 @@ function refreshTray(data) {
   tray.setContextMenu(buildTrayMenu(data || loadData()))
 }
 
+// macOS menu bar: a one-color template image at 1x + 2x, tinted by macOS for
+// light and dark menu bars. Windows keeps the color logo.
+function trayImage() {
+  if (!IS_MAC) return nativeImage.createFromDataURL(trayIcon32)
+  const image = nativeImage.createFromDataURL(trayTemplate16)
+  image.addRepresentation({ scaleFactor: 2, dataURL: trayTemplate32 })
+  image.setTemplateImage(true)
+  return image
+}
+
 function createTray() {
-  tray = new Tray(nativeImage.createFromDataURL(trayIcon32))
+  tray = new Tray(trayImage())
   refreshTray()
   tray.on('click', showMainWindow)
   tray.on('double-click', showMainWindow)
+}
+
+// ---- Start at login ----------------------------------------------------------
+// Windows: a registry entry, written as before. macOS: a login item, which
+// only a packaged (signed) app can register: in development macOS refuses,
+// and it would be the bare Electron binary anyway. macOS also doesn't throw
+// on failure, so the result is read back.
+function applyLoginItem(enabled) {
+  if (IS_MAC && !app.isPackaged) return { ok: false, error: 'login_item_dev' }
+  try {
+    if (IS_MAC && app.getLoginItemSettings().openAtLogin === enabled) return { ok: true }
+    app.setLoginItemSettings({ openAtLogin: enabled })
+    if (IS_MAC && app.getLoginItemSettings().openAtLogin !== enabled) {
+      return { ok: false, error: 'login_item_failed' }
+    }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, error: String(err) }
+  }
+}
+
+// ---- macOS menu bar --------------------------------------------------------
+// macOS always shows an app menu, and it's where ⌘Q, ⌘H, ⌘W and the editing
+// shortcuts (⌘C/⌘V in text fields) come from. Windows keeps Electron's
+// default (hidden) menu, as before. The renderer sees key presses before the
+// menu, so its own ⌘K / ⌘N / ⌘F / ⌘A handling is unaffected.
+
+let appMenuLang = ''
+
+function setAppMenu() {
+  if (!IS_MAC) return
+  // Rebuilt only when the language changes (data:save calls this often).
+  if (appMenuLang === t('appName')) return
+  appMenuLang = t('appName')
+
+  const openSettings = () => {
+    showMainWindow()
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('settings:open')
+  }
+  const template = [
+    {
+      label: t('appName'),
+      submenu: [
+        { role: 'about', label: t('menuAbout') },
+        { type: 'separator' },
+        { label: t('menuSettings'), accelerator: 'Command+,', click: openSettings },
+        { type: 'separator' },
+        { role: 'hide', label: t('menuHide') },
+        { role: 'hideOthers', label: t('menuHideOthers') },
+        { role: 'unhide', label: t('menuShowAll') },
+        { type: 'separator' },
+        { role: 'quit', label: t('menuQuit') }
+      ]
+    },
+    {
+      label: t('menuEdit'),
+      submenu: [
+        { role: 'undo', label: t('menuUndo') },
+        { role: 'redo', label: t('menuRedo') },
+        { type: 'separator' },
+        { role: 'cut', label: t('menuCut') },
+        { role: 'copy', label: t('menuCopy') },
+        { role: 'paste', label: t('menuPaste') },
+        { role: 'selectAll', label: t('menuSelectAll') }
+      ]
+    },
+    {
+      label: t('menuView'),
+      submenu: [
+        // Reload and dev tools only while developing.
+        ...(app.isPackaged ? [] : [{ role: 'reload' }, { role: 'toggleDevTools' }, { type: 'separator' }]),
+        { role: 'togglefullscreen', label: t('menuFullScreen') }
+      ]
+    },
+    {
+      label: t('menuWindow'),
+      submenu: [
+        { role: 'minimize', label: t('menuMinimize') },
+        { role: 'zoom', label: t('menuZoom') },
+        // Same as the close button: hides to the menu bar when that's on.
+        { role: 'close', label: t('menuClose') },
+        { type: 'separator' },
+        { role: 'front', label: t('menuFront') }
+      ]
+    }
+  ]
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
 // ---- Launchers ------------------------------------------------------------
@@ -326,57 +454,98 @@ function startDetached(cmd, args, options) {
   })
 }
 
-// Editor CLIs (code, code-insiders, cursor) are .cmd shims on Windows, so they
-// need the shell. With shell:true Node joins args unquoted, hence the explicit
-// quotes — otherwise a path with a space opens two folders, and one with an
-// `&` would run a command. Windows paths can't contain `"`.
-async function launchCommand(command, folderPath) {
-  if (!command) return { ok: false, error: 'no_command' }
-  if (!folderPath || !existsSync(folderPath)) return { ok: false, error: 'not_found' }
-  // Through the shell, a missing command still "starts" (cmd prints an error
-  // and exits), so check a bare command name exists first. Commands given as
-  // a full path or with arguments are left to the shell.
-  if (/^[\w.-]+$/.test(command) && !(await commandExists(command))) {
-    return { ok: false, error: 'command_not_found' }
-  }
-  return startDetached(command, [`"${folderPath}"`], { shell: true, windowsHide: true })
-}
-
-function commandExists(command) {
+// Run a short-lived process to completion and report whether it succeeded.
+// For launchers that only fail visibly through their exit code (`open -a`).
+function runToCompletion(cmd, args, options) {
   return new Promise((resolve) => {
-    execFile('where', [command], { windowsHide: true, timeout: 3000 }, (err) => resolve(!err))
+    execFile(cmd, args, { timeout: 15000, ...options }, (err, _stdout, stderr) => {
+      if (err) resolve({ ok: false, error: String(stderr || err.message || err).trim() })
+      else resolve({ ok: true })
+    })
   })
 }
 
-// Windows Terminal when it's installed, the classic console otherwise.
+// Start a spec from launchers.js.
+function startSpec(spec) {
+  return spec.wait
+    ? runToCompletion(spec.cmd, spec.args, spec.options)
+    : startDetached(spec.cmd, spec.args, spec.options)
+}
+
+// macOS / Linux: pick up the login shell's PATH once, in the background, so
+// editors and package managers from Homebrew, nvm... are found even when the
+// app was started from Finder or the Dock. Launchers wait for it.
+function loadLoginShellPath() {
+  return new Promise((resolve) => {
+    const spec = loginShellPathSpec(process.env.SHELL)
+    execFile(spec.cmd, spec.args, { timeout: 5000 }, (_err, stdout) => {
+      process.env.PATH = mergePath(process.env.PATH, parseLoginShellPath(stdout))
+      resolve()
+    })
+  })
+}
+const pathReady = IS_WIN ? Promise.resolve() : loadLoginShellPath()
+
+// Open a folder with an editor command (see editorSpec for the quoting).
+async function launchCommand(command, folderPath) {
+  if (!command) return { ok: false, error: 'no_command' }
+  if (!folderPath || !existsSync(folderPath)) return { ok: false, error: 'not_found' }
+  await pathReady
+  // Through the shell, a missing command still "starts" (the shell prints an
+  // error and exits), so check a bare command name exists first. Commands
+  // given as a full path or with arguments are left to the shell.
+  if (/^[\w.-]+$/.test(command) && !(await commandExists(command))) {
+    // On macOS the editor may be installed without its shell command.
+    const fallback = editorFallbackSpec(command, folderPath, PLATFORM)
+    if (fallback && (await startSpec(fallback)).ok) return { ok: true }
+    return { ok: false, error: 'command_not_found' }
+  }
+  return startSpec(editorSpec(command, folderPath, PLATFORM))
+}
+
+function commandExists(command) {
+  const spec = commandExistsSpec(command, PLATFORM)
+  return new Promise((resolve) => {
+    execFile(spec.cmd, spec.args, { timeout: 3000, ...spec.options }, (err) => resolve(!err))
+  })
+}
+
+// The first terminal of the platform's list that starts (on Windows: Windows
+// Terminal when it's installed, the classic console otherwise).
 async function openTerminal(folderPath) {
   if (!folderPath || !existsSync(folderPath)) return { ok: false, error: 'not_found' }
-  // wt treats `;` as a command separator, so it has to be escaped in the path.
-  const wt = await startDetached('wt.exe', ['-d', folderPath.replace(/;/g, '\\;')], {})
-  if (wt.ok) return wt
-  return startDetached('cmd.exe', ['/c', 'start', '', 'cmd.exe', '/k', `cd /d "${folderPath}"`], {})
+  let result = { ok: false, error: 'unknown' }
+  for (const spec of terminalSpecs(folderPath, PLATFORM)) {
+    result = await startSpec(spec)
+    if (result.ok) return result
+  }
+  return result
 }
 
 const SAFE_SCRIPT_NAME = /^[\w:.@/+-]+$/
 const JS_PMS = new Set(['npm', 'yarn', 'pnpm', 'bun'])
 
 // Run a package.json script in its own visible terminal window, so the user
-// can watch output and Ctrl+C it. The script name ends up inside a cmd.exe
+// can watch output and Ctrl+C it. The script name ends up inside a shell
 // command line, so it must be a script this package.json actually declares
 // and contain no shell metacharacters; the package manager is detected here
 // rather than trusted from the renderer.
-function runScript(folderPath, script) {
-  if (!folderPath || !existsSync(folderPath)) return Promise.resolve({ ok: false, error: 'not_found' })
+async function runScript(folderPath, script) {
+  if (!CAN_RUN_SCRIPTS) return { ok: false, error: 'scripts_unsupported' }
+  if (!folderPath || !existsSync(folderPath)) return { ok: false, error: 'not_found' }
   const pkg = getScripts(folderPath)
   if (!pkg.ok || !Object.prototype.hasOwnProperty.call(pkg.scripts, script)) {
-    return Promise.resolve({ ok: false, error: 'unknown_script' })
+    return { ok: false, error: 'unknown_script' }
   }
-  if (!SAFE_SCRIPT_NAME.test(script)) return Promise.resolve({ ok: false, error: 'unsafe_script' })
+  if (!SAFE_SCRIPT_NAME.test(script)) return { ok: false, error: 'unsafe_script' }
 
   const pm = JS_PMS.has(pkg.packageManager) ? pkg.packageManager : 'npm'
   // yarn takes the script name directly; npm/pnpm/bun need `run`.
   const cmd = pm === 'yarn' ? `yarn ${script}` : `${pm} run ${script}`
-  return startDetached('cmd.exe', ['/c', 'start', '', 'cmd.exe', '/k', `cd /d "${folderPath}" && ${cmd}`], {})
+  await pathReady
+  const spec = scriptSpec(folderPath, cmd, PLATFORM)
+  if (!spec) return { ok: false, error: 'scripts_unsupported' }
+  return startSpec(spec)
 }
 
 // Launch: open every project of the plan (see shared/links.js) in its own
@@ -391,7 +560,7 @@ async function runLaunchPlan(plan) {
     const result = { id: step.id, name: step.name, ok: !!opened.ok, error: opened.error || '' }
     // The dev script still starts when only the editor failed (e.g. not
     // installed); a missing folder stops both.
-    if (opened.error !== 'not_found' && typeof step.script === 'string' && step.script) {
+    if (CAN_RUN_SCRIPTS && opened.error !== 'not_found' && typeof step.script === 'string' && step.script) {
       const ran = await runScript(step.path, step.script)
       if (!ran.ok) result.scriptError = ran.error || 'unknown'
     }
@@ -445,6 +614,7 @@ function registerIpc() {
     if (miniWindow && !miniWindow.isDestroyed()) miniWindow.webContents.send('data:changed', data)
     setLanguage(data?.settings?.language)
     refreshTray(data)
+    setAppMenu()
     return res
   })
   ipcMain.handle('data:path', () => getDataFilePath())
@@ -537,12 +707,7 @@ function registerIpc() {
 
   ipcMain.handle('settings:autoLaunch', (_e, enabled) => {
     if (IS_STORE) return { ok: false, error: 'store_startup' }
-    try {
-      app.setLoginItemSettings({ openAtLogin: !!enabled })
-      return { ok: true }
-    } catch (err) {
-      return { ok: false, error: String(err) }
-    }
+    return applyLoginItem(!!enabled)
   })
 
   ipcMain.handle('settings:minimizeToTray', (_e, enabled) => {
@@ -561,6 +726,7 @@ function registerIpc() {
   })
   ipcMain.on('window:close', () => mainWindow && mainWindow.close())
   ipcMain.handle('window:isMaximized', () => !!(mainWindow && mainWindow.isMaximized()))
+  ipcMain.handle('window:isFullScreen', () => !!(mainWindow && mainWindow.isFullScreen()))
 
   // "Always on top" for whichever window asks (title bar pin / mini window).
   ipcMain.handle('window:setAlwaysOnTop', (e, on) => {
@@ -627,6 +793,7 @@ if (!gotLock) {
     setLanguage(settings.language)
 
     registerIpc()
+    setAppMenu()
     createSplash()
     createWindow()
     createTray()
@@ -635,13 +802,18 @@ if (!gotLock) {
     try {
       minimizeToTray = settings.minimizeToTray !== false
       if (settings.globalShortcut) registerGlobalShortcut(settings.globalShortcut)
-      if (!IS_STORE) app.setLoginItemSettings({ openAtLogin: !!settings.autoLaunch })
+      if (!IS_STORE) applyLoginItem(!!settings.autoLaunch)
     } catch {
       /* ignore */
     }
 
+    // macOS only: clicking the Dock icon. The window is usually just hidden
+    // (minimize to tray), so bring it back rather than only creating one
+    // when none exists.
+    // It also fires on first launch; leave the window to the splash until
+    // it's ready to show.
     app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+      if (!splashWindow) showMainWindow()
     })
   })
 

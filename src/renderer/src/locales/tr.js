@@ -102,7 +102,7 @@ export default {
     repo: 'depo',
     missing: 'Klasör bulunamadı',
     openTasks: '{count} açık görev',
-    select: 'Seç (Ctrl veya Shift ile tıklayarak da seçebilirsin)',
+    select: 'Seç ({mod} veya {shift} ile tıklayarak da seçebilirsin)',
     linked: 'Bağlı: {names}',
     launchTitle: 'Başlat: {what}',
     tasks: 'Görevler',
@@ -189,6 +189,8 @@ export default {
     links: 'Bağlı projeler',
     linksHint:
       "Örneğin bir frontend'i backend'ine bağla. Başlat'a bastığında bağlı projeler de kendi editörlerinde açılır; başlangıç script'i seçilmiş olanlarda script ayrı bir terminalde çalışır.",
+    linksHintNoScripts:
+      "Örneğin bir frontend'i backend'ine bağla. Başlat'a bastığında bağlı projeler de kendi editörlerinde açılır.",
     noLinks: 'Henüz bağlı proje yok.',
     addLink: 'Proje bağla…',
     unlink: 'Bağlantıyı kaldır',
@@ -329,6 +331,7 @@ export default {
     tray: 'Kapatınca sistem tepsisine küçült',
     trayDesc: 'Pencereyi kapattığında uygulama kapanmaz; gizli simgeler alanındaki tepsi simgesinden yeniden açılır.',
     autoLaunch: 'Windows ile birlikte başlat',
+    autoLaunchMac: 'Oturum açıldığında başlat',
     autoLaunchDesc: 'Bilgisayar açıldığında uygulamayı otomatik çalıştırır.',
     autoLaunchStoreDesc: "Microsoft Store sürümünde bu ayar Windows'tan yönetilir: Ayarlar → Uygulamalar → Başlangıç.",
     openStartupSettings: 'Başlangıç ayarlarını aç',
@@ -395,6 +398,9 @@ export default {
     invalid_backup: 'Bu dosya geçerli bir yedek değil.',
     no_command: 'Editör komutu tanımlı değil.',
     command_not_found: 'Komut bulunamadı.',
+    login_item_dev: 'Oturum açıldığında başlatma yalnızca paketlenmiş uygulamada çalışır, geliştirme modunda değil.',
+    login_item_failed: 'macOS bu ayarı uygulamadı. Sistem Ayarları → Genel → Giriş Öğeleri bölümünden kontrol edebilirsin.',
+    scripts_unsupported: "Script çalıştırma macOS'ta henüz desteklenmiyor.",
     unknown: 'Beklenmeyen bir hata oluştu.'
   },
   colors: {

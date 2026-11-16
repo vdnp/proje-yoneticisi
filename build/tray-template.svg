@@ -1,0 +1,26 @@
+<!-- macOS menu bar icon: the logo reduced to one color on a 32px grid, with
+     every edge on an even coordinate so the 16px (1x) rendering stays sharp.
+     Template image: macOS only uses the alpha channel and tints it for the
+     light / dark menu bar, so everything is plain black. -->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- corner handles -->
+  <g fill="none" stroke="#000" stroke-width="2">
+    <rect x="3" y="3" width="4" height="4" rx="1" />
+    <rect x="25" y="3" width="4" height="4" rx="1" />
+    <rect x="3" y="25" width="4" height="4" rx="1" />
+    <rect x="25" y="25" width="4" height="4" rx="1" />
+  </g>
+  <!-- broken frame -->
+  <g stroke="#000" stroke-width="2" stroke-linecap="butt">
+    <line x1="10" y1="5" x2="22" y2="5" />
+    <line x1="10" y1="27" x2="22" y2="27" />
+    <line x1="5" y1="10" x2="5" y2="22" />
+    <line x1="27" y1="10" x2="27" y2="22" />
+  </g>
+  <!-- content cards -->
+  <g fill="#000">
+    <rect x="10" y="10" width="4" height="4" rx="1" />
+    <rect x="18" y="10" width="4" height="4" rx="1" />
+    <rect x="10" y="18" width="12" height="4" rx="1" />
+  </g>
+</svg>

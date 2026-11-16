@@ -105,7 +105,7 @@ export default {
     missing: 'Folder not found',
     openTasks_one: '{count} open task',
     openTasks_other: '{count} open tasks',
-    select: 'Select (Ctrl+click or Shift+click works too)',
+    select: 'Select ({mod}+click or {shift}+click works too)',
     linked: 'Linked: {names}',
     launchTitle: 'Launch: {what}',
     tasks: 'Tasks',
@@ -197,6 +197,8 @@ export default {
     links: 'Linked projects',
     linksHint:
       'Link a frontend to its backend, for example. Launch then opens the linked projects too, each in its own editor, and starts the launch script of each project that has one in its own terminal.',
+    linksHintNoScripts:
+      'Link a frontend to its backend, for example. Launch then opens the linked projects too, each in its own editor.',
     noLinks: 'No linked projects yet.',
     addLink: 'Link a project…',
     unlink: 'Unlink',
@@ -341,6 +343,7 @@ export default {
     tray: 'Minimize to tray on close',
     trayDesc: 'Closing the window keeps the app running; reopen it from the tray icon.',
     autoLaunch: 'Start with Windows',
+    autoLaunchMac: 'Open at login',
     autoLaunchDesc: 'Launches the app automatically when you sign in.',
     autoLaunchStoreDesc: 'In the Microsoft Store version this is managed by Windows: Settings → Apps → Startup.',
     openStartupSettings: 'Open startup settings',
@@ -409,6 +412,9 @@ export default {
     invalid_backup: "This file isn't a valid backup.",
     no_command: 'No editor command is set.',
     command_not_found: 'Command not found.',
+    login_item_dev: 'Open at login only works in the packaged app, not in development mode.',
+    login_item_failed: "macOS didn't apply this. You can check it under System Settings → General → Login Items.",
+    scripts_unsupported: "Running scripts isn't supported on macOS yet.",
     unknown: 'Something went wrong.'
   },
   colors: {

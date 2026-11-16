@@ -21,6 +21,7 @@ import { projectColorHex } from '../lib/groups.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
 import { useGitStatus } from '../lib/useGitStatus.js'
 import { useI18n } from '../lib/i18n.js'
+import { canRunScripts } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
 
 function ActionButton({ title, onClick, children, disabled }) {
@@ -307,7 +308,7 @@ export default function ProjectCard({
       <div className="min-h-3 flex-1" aria-hidden="true" />
       <div className="flex items-center justify-between border-t border-surface-border pt-3">
         <div className="flex items-center gap-0.5">
-          {isLaunchable(project) && (
+          {isLaunchable(project, canRunScripts) && (
             <ActionButton title={launchTitle(t, project, linked)} onClick={() => actions.launch(project)}>
               <Play size={15} className="text-brand" />
             </ActionButton>

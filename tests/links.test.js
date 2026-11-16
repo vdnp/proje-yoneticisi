@@ -96,6 +96,11 @@ describe('isLaunchable', () => {
     expect(isLaunchable({ links: [], startScript: '' })).toBe(false)
     expect(isLaunchable({})).toBe(false)
   })
+
+  it("ignores the launch script where scripts can't run (macOS)", () => {
+    expect(isLaunchable({ startScript: 'dev' }, false)).toBe(false)
+    expect(isLaunchable({ links: ['b'], startScript: 'dev' }, false)).toBe(true)
+  })
 })
 
 describe('launchPlan', () => {
@@ -116,6 +121,12 @@ describe('launchPlan', () => {
 
   it("falls back to 'code' without a default editor", () => {
     expect(launchPlan(projects[3], [], '')[0].command).toBe('code')
+  })
+
+  it("starts no scripts where scripts can't run (macOS)", () => {
+    const plan = launchPlan(projects[0], projects, 'code', false)
+    expect(plan.map((s) => s.id)).toEqual(['a', 'b', 'd'])
+    expect(plan.every((s) => s.script === '')).toBe(true)
   })
 
   it('is empty when the project itself has no path and no links', () => {

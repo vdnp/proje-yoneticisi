@@ -17,6 +17,7 @@ import { projectColorHex, groupColorHex } from './lib/groups.js'
 import { useI18n } from './lib/i18n.js'
 import { refreshGitStatuses } from './lib/useGitStatus.js'
 import api from './lib/api.js'
+import { isMac } from './lib/platform.js'
 import useStore from './store/useStore.js'
 
 export default function App() {
@@ -102,6 +103,12 @@ export default function App() {
     return api.onOpenPalette(() => setPaletteOpen(true))
   }, [])
 
+  // macOS app menu → Settings… (⌘,).
+  useEffect(() => {
+    if (!api.onOpenSettings) return
+    return api.onOpenSettings(() => setRoute({ name: 'settings' }))
+  }, [setRoute])
+
   // Mouse back / forward buttons.
   useEffect(() => {
     const onMouse = (e) => {
@@ -118,7 +125,14 @@ export default function App() {
       const mod = e.ctrlKey || e.metaKey
       const key = e.key.toLowerCase()
 
-      if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      // Back / forward. macOS uses ⌘[ / ⌘], as Finder and Safari do: there
+      // ⌥←/→ moves the cursor by word in text fields.
+      if (isMac) {
+        if (e.metaKey && !e.altKey && !e.shiftKey && (e.key === '[' || e.key === ']')) {
+          e.preventDefault()
+          return e.key === '[' ? goBack() : goForward()
+        }
+      } else if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
         e.preventDefault()
         return e.key === 'ArrowLeft' ? goBack() : goForward()
       }

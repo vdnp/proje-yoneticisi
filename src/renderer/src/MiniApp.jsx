@@ -8,6 +8,7 @@ import { applyTheme } from './lib/theme.js'
 import { useI18n, errorText } from './lib/i18n.js'
 import { isLaunchable, launchPlan, linkedProjects } from '../../shared/links.js'
 import api from './lib/api.js'
+import { canRunScripts } from './lib/platform.js'
 import useStore from './store/useStore.js'
 
 // The mini window (#mini): search plus favorites / recently opened, with each
@@ -33,7 +34,7 @@ function Row({ item, active, onRun, onHover }) {
   const groups = useStore((s) => s.groups)
   const { t } = useI18n()
   const color = projectColorHex(p, groups)
-  const launchable = isLaunchable(p)
+  const launchable = isLaunchable(p, canRunScripts)
   const { open } = todoProgress(p)
 
   return (
@@ -151,8 +152,8 @@ export default function MiniApp() {
     const p = item.project
     setError('')
     const editor = settings.defaultEditor
-    if (!editorOnly && isLaunchable(p)) {
-      const results = (await api.launch(launchPlan(p, projects, editor))) || []
+    if (!editorOnly && isLaunchable(p, canRunScripts)) {
+      const results = (await api.launch(launchPlan(p, projects, editor, canRunScripts))) || []
       api.notifyOpened(results.filter((r) => r.ok).map((r) => r.id))
       const failed = results.find((r) => !r.ok || r.scriptError)
       if (failed) setError(`${failed.name}: ${errorText(t, failed.error || failed.scriptError)}`)
