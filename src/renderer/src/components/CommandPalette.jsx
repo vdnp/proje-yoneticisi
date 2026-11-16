@@ -4,6 +4,7 @@ import { cn } from '../lib/utils.js'
 import { fuzzyScore, fuzzyScoreAny } from '../lib/fuzzy.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
 import { useI18n } from '../lib/i18n.js'
+import { KEYS, canRunScripts } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
 import { isLaunchable } from '../../../shared/links.js'
 
@@ -49,11 +50,11 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
       label: p.name,
       hint: p.path,
       project: p,
-      launchable: isLaunchable(p),
+      launchable: isLaunchable(p, canRunScripts),
       // Enter → launch (linked projects, dev script) or just open in the
       // editor. Shift+Enter → editor only. Ctrl+Enter → detail page.
       run: () => {
-        if (isLaunchable(p)) actions.launch(p)
+        if (isLaunchable(p, canRunScripts)) actions.launch(p)
         else actions.openInEditor(p)
         onClose()
       },
@@ -192,12 +193,12 @@ export default function CommandPalette({ onClose, onOpenProject, onGoSettings, o
           </span>
           {items[index]?.launchable && (
             <span className="flex items-center gap-1">
-              <Kbd>Shift</Kbd>
+              <Kbd>{KEYS.shift}</Kbd>
               <Kbd>⏎</Kbd> {t('palette.editorOnly')}
             </span>
           )}
           <span className="flex items-center gap-1">
-            <Kbd>Ctrl</Kbd>
+            <Kbd>{KEYS.mod}</Kbd>
             <Kbd>⏎</Kbd> {t('palette.details')}
           </span>
           <span className="ml-auto flex items-center gap-1">

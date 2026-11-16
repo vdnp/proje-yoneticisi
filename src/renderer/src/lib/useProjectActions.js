@@ -1,5 +1,6 @@
 import api from './api.js'
 import { useI18n, errorText } from './i18n.js'
+import { canRunScripts } from './platform.js'
 import useStore from '../store/useStore.js'
 import { showAlert } from './dialogs.js'
 import { launchPlan } from '../../../shared/links.js'
@@ -56,7 +57,7 @@ export function useProjectActions() {
     // Open the project and its linked projects, each in its own editor, and
     // start their dev scripts. One summary alert lists whatever failed.
     launch: async (project) => {
-      const plan = launchPlan(project, useStore.getState().projects, settings.defaultEditor)
+      const plan = launchPlan(project, useStore.getState().projects, settings.defaultEditor, canRunScripts)
       if (!plan.length) return showAlert(t('actions.noPath'))
       const results = (await api.launch(plan)) || []
       const problems = []

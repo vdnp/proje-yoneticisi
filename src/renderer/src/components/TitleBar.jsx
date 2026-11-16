@@ -4,7 +4,26 @@ import WindowControls from './WindowControls.jsx'
 import { cn } from '../lib/utils.js'
 import api from '../lib/api.js'
 import { useI18n } from '../lib/i18n.js'
+import { isMac, shortcutLabel } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
+
+// Back / forward: Alt+←/→ on Windows; ⌘[ / ⌘] on macOS, where ⌥←/→ moves by
+// word in text fields.
+const BACK_KEYS = isMac ? shortcutLabel(['mod', '[']) : shortcutLabel(['alt', '←'])
+const FORWARD_KEYS = isMac ? shortcutLabel(['mod', ']']) : shortcutLabel(['alt', '→'])
+
+// macOS draws its own traffic lights over the top-left corner of the window
+// (see trafficLightPosition in the main process); the bar leaves room for
+// them, except in full screen where they're hidden.
+function useFullScreen() {
+  const [fullScreen, setFullScreen] = useState(false)
+  useEffect(() => {
+    if (!isMac || !api.onWindowFullScreen) return
+    api.windowIsFullScreen().then(setFullScreen)
+    return api.onWindowFullScreen(setFullScreen)
+  }, [])
+  return fullScreen
+}
 
 // Frameless-window title bar: back/forward and the current location on the
 // left, quick toggles and the window controls on the right. The strip is a
@@ -65,6 +84,7 @@ export default function TitleBar({ crumbs = [], canBack, canForward, onBack, onF
   const theme = useStore((s) => s.settings.theme)
   const updateSettings = useStore((s) => s.updateSettings)
   const [onTop, setOnTop] = useState(false)
+  const fullScreen = useFullScreen()
   const { t } = useI18n()
 
   useEffect(() => {
@@ -77,13 +97,16 @@ export default function TitleBar({ crumbs = [], canBack, canForward, onBack, onF
   return (
     <div
       style={drag}
-      className="pm-glass relative flex h-10 shrink-0 select-none items-center gap-3 border-b border-surface-border bg-surface-bg pl-2"
+      className={cn(
+        'pm-glass relative flex h-10 shrink-0 select-none items-center gap-3 border-b border-surface-border bg-surface-bg',
+        isMac && !fullScreen ? 'pl-[78px]' : 'pl-2'
+      )}
     >
       <div className="flex items-center gap-0.5">
-        <BarButton title={`${t('titlebar.back')} (Alt+←)`} onClick={onBack} disabled={!canBack}>
+        <BarButton title={`${t('titlebar.back')} (${BACK_KEYS})`} onClick={onBack} disabled={!canBack}>
           <ArrowLeft size={16} />
         </BarButton>
-        <BarButton title={`${t('titlebar.forward')} (Alt+→)`} onClick={onForward} disabled={!canForward}>
+        <BarButton title={`${t('titlebar.forward')} (${FORWARD_KEYS})`} onClick={onForward} disabled={!canForward}>
           <ArrowRight size={16} />
         </BarButton>
       </div>
@@ -97,7 +120,7 @@ export default function TitleBar({ crumbs = [], canBack, canForward, onBack, onF
         ))}
       </nav>
 
-      <div className="ml-auto flex h-full items-center gap-0.5">
+      <div className={cn('ml-auto flex h-full items-center gap-0.5', isMac && 'pr-2')}>
         <BarButton
           title={isLight ? t('titlebar.darkTheme') : t('titlebar.lightTheme')}
           onClick={() => updateSettings({ theme: isLight ? 'dark' : 'light' })}
@@ -110,8 +133,13 @@ export default function TitleBar({ crumbs = [], canBack, canForward, onBack, onF
         <BarButton title={t('titlebar.mini')} onClick={() => api.openMini()}>
           <PictureInPicture size={15} />
         </BarButton>
-        <span className="mx-1.5 h-4 w-px bg-surface-border" aria-hidden="true" />
-        <WindowControls />
+        {/* macOS has its traffic lights instead. */}
+        {!isMac && (
+          <>
+            <span className="mx-1.5 h-4 w-px bg-surface-border" aria-hidden="true" />
+            <WindowControls />
+          </>
+        )}
       </div>
     </div>
   )

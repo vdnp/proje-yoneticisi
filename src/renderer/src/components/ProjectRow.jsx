@@ -8,6 +8,7 @@ import { cn, relativeTime, todoProgress } from '../lib/utils.js'
 import { projectColorHex } from '../lib/groups.js'
 import { useProjectActions } from '../lib/useProjectActions.js'
 import { useI18n } from '../lib/i18n.js'
+import { canRunScripts } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
 
 function IconBtn({ title, onClick, children, disabled }) {
@@ -179,7 +180,7 @@ export default function ProjectRow({
       </span>
 
       <div className="flex shrink-0 items-center gap-0.5">
-        {isLaunchable(project) ? (
+        {isLaunchable(project, canRunScripts) ? (
           <IconBtn title={launchTitle(t, project, linked)} onClick={() => actions.launch(project)}>
             <Play size={15} className="text-brand" />
           </IconBtn>

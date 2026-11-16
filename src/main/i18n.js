@@ -1,7 +1,8 @@
 import { app } from 'electron'
 
-// The few strings the main process shows itself: tray menu, splash screen and
-// native file dialogs. Everything else is translated in the renderer.
+// The few strings the main process shows itself: tray menu, splash screen,
+// native file dialogs and the macOS menu bar. Everything else is translated
+// in the renderer.
 const STRINGS = {
   tr: {
     appName: 'Proje Yöneticisi',
@@ -13,7 +14,28 @@ const STRINGS = {
     pickFolder: 'Proje klasörü seç',
     exportTitle: 'Verileri dışa aktar',
     importTitle: 'Yedeği içe aktar',
-    jsonFiles: 'JSON dosyaları'
+    jsonFiles: 'JSON dosyaları',
+    // macOS menu bar
+    menuAbout: 'Proje Yöneticisi Hakkında',
+    menuSettings: 'Ayarlar…',
+    menuHide: "Proje Yöneticisi'ni Gizle",
+    menuHideOthers: 'Diğerlerini Gizle',
+    menuShowAll: 'Tümünü Göster',
+    menuQuit: "Proje Yöneticisi'nden Çık",
+    menuEdit: 'Düzen',
+    menuUndo: 'Geri Al',
+    menuRedo: 'Yinele',
+    menuCut: 'Kes',
+    menuCopy: 'Kopyala',
+    menuPaste: 'Yapıştır',
+    menuSelectAll: 'Tümünü Seç',
+    menuView: 'Görünüm',
+    menuFullScreen: 'Tam Ekran',
+    menuWindow: 'Pencere',
+    menuMinimize: 'Küçült',
+    menuZoom: 'Büyüt/Küçült',
+    menuClose: 'Pencereyi Kapat',
+    menuFront: 'Tümünü Öne Getir'
   },
   en: {
     appName: 'Project Manager',
@@ -25,7 +47,28 @@ const STRINGS = {
     pickFolder: 'Choose a project folder',
     exportTitle: 'Export data',
     importTitle: 'Import a backup',
-    jsonFiles: 'JSON files'
+    jsonFiles: 'JSON files',
+    // macOS menu bar
+    menuAbout: 'About Project Manager',
+    menuSettings: 'Settings…',
+    menuHide: 'Hide Project Manager',
+    menuHideOthers: 'Hide Others',
+    menuShowAll: 'Show All',
+    menuQuit: 'Quit Project Manager',
+    menuEdit: 'Edit',
+    menuUndo: 'Undo',
+    menuRedo: 'Redo',
+    menuCut: 'Cut',
+    menuCopy: 'Copy',
+    menuPaste: 'Paste',
+    menuSelectAll: 'Select All',
+    menuView: 'View',
+    menuFullScreen: 'Toggle Full Screen',
+    menuWindow: 'Window',
+    menuMinimize: 'Minimize',
+    menuZoom: 'Zoom',
+    menuClose: 'Close Window',
+    menuFront: 'Bring All to Front'
   }
 }
 

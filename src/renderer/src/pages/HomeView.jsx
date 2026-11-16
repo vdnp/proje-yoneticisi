@@ -8,6 +8,7 @@ import { cn } from '../lib/utils.js'
 import { fuzzyScoreAny } from '../lib/fuzzy.js'
 import { SORTS, sortProjects, customOrderIds, moveIds } from '../lib/sort.js'
 import { useI18n } from '../lib/i18n.js'
+import { KEYS } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
 
 const DRAG_TYPE = 'application/x-project-id'
@@ -274,7 +275,7 @@ export default function HomeView({ filter, onOpenProject, onAdd, onScan, keyboar
           />
           <span className="pointer-events-none absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
             <kbd className="rounded border border-surface-border bg-surface-bg px-1.5 py-0.5 text-[10px] font-medium text-content-faint">
-              Ctrl
+              {KEYS.mod}
             </kbd>
             <kbd className="rounded border border-surface-border bg-surface-bg px-1.5 py-0.5 text-[10px] font-medium text-content-faint">
               K

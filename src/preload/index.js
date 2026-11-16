@@ -4,6 +4,8 @@ import { contextBridge, ipcRenderer, webUtils } from 'electron'
 // in src/renderer/src/lib/mockApi.js for the browser-only preview build.
 const api = {
   isElectron: true,
+  // 'win32' | 'darwin' | 'linux': the renderer adapts labels and the title bar.
+  platform: process.platform,
   loadData: () => ipcRenderer.invoke('data:load'),
   saveData: (data) => ipcRenderer.invoke('data:save', data),
   getDataPath: () => ipcRenderer.invoke('data:path'),
@@ -60,6 +62,20 @@ const api = {
     const listener = (_e, val) => cb(val)
     ipcRenderer.on('window:maximized', listener)
     return () => ipcRenderer.removeListener('window:maximized', listener)
+  },
+  // macOS: the traffic lights disappear in full screen, and so does the room
+  // the title bar keeps for them.
+  windowIsFullScreen: () => ipcRenderer.invoke('window:isFullScreen'),
+  onWindowFullScreen: (cb) => {
+    const listener = (_e, val) => cb(val)
+    ipcRenderer.on('window:fullscreen', listener)
+    return () => ipcRenderer.removeListener('window:fullscreen', listener)
+  },
+  // macOS app menu → Settings (⌘,).
+  onOpenSettings: (cb) => {
+    const listener = () => cb()
+    ipcRenderer.on('settings:open', listener)
+    return () => ipcRenderer.removeListener('settings:open', listener)
   },
 
   // Drag & drop: Electron 32+ removed File.path, so the real path must be

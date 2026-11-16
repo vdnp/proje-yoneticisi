@@ -50,15 +50,17 @@ export function linkedProjects(project, projects) {
 
 // "Launch" does more than "open in editor" only when there is something extra
 // to do: linked projects to open alongside, or a dev script to start.
-export function isLaunchable(project) {
-  return (project.links || []).length > 0 || !!project.startScript
+// `canRunScripts` is false where the app can't start scripts yet (macOS): a
+// launch script alone then doesn't make a project launchable.
+export function isLaunchable(project, canRunScripts = true) {
+  return (project.links || []).length > 0 || (canRunScripts && !!project.startScript)
 }
 
 // Everything a launch does, in order: the project itself first, then its
 // linked projects. Each opens in its own editor; `script` is the
-// package.json script to start in a terminal ('' = none). Projects without a
-// folder path are skipped.
-export function launchPlan(project, projects, defaultEditor) {
+// package.json script to start in a terminal ('' = none, and always none when
+// `canRunScripts` is false). Projects without a folder path are skipped.
+export function launchPlan(project, projects, defaultEditor, canRunScripts = true) {
   return [project, ...linkedProjects(project, projects)]
     .filter((p) => p.path)
     .map((p) => ({
@@ -66,6 +68,6 @@ export function launchPlan(project, projects, defaultEditor) {
       name: p.name,
       path: p.path,
       command: p.editorCommand || defaultEditor || 'code',
-      script: p.startScript || ''
+      script: (canRunScripts && p.startScript) || ''
     }))
 }

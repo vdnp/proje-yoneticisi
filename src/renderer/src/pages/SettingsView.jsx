@@ -17,7 +17,12 @@ import { cn, newId, relativeTime, formatDate } from '../lib/utils.js'
 import { ACCENT_LIST, STYLES, CARD_COLORS, CARD_LAYOUTS } from '../lib/theme.js'
 import { LANGUAGES, useI18n, errorText } from '../lib/i18n.js'
 import api from '../lib/api.js'
+import { showAlert } from '../lib/dialogs.js'
+import { isMac } from '../lib/platform.js'
 import useStore from '../store/useStore.js'
+
+// "Start with Windows" / "Open at login" (the Store build keeps its own row).
+const autoLaunchKey = isMac ? 'settings.autoLaunchMac' : 'settings.autoLaunch'
 
 const inputCls =
   'w-full rounded-xl border border-surface-border bg-surface-bg px-3 py-2 text-sm text-content-primary placeholder:text-content-faint focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/20'
@@ -276,9 +281,15 @@ export default function SettingsView({ onOpenProject }) {
     setTimeout(() => setShortcutMsg(''), 3000)
   }
 
+  // Put the switch back if the OS didn't take it (on macOS: not in
+  // development, or refused by the system).
   const toggleAutoLaunch = async (val) => {
     updateSettings({ autoLaunch: val })
-    await api.setAutoLaunch(val)
+    const res = await api.setAutoLaunch(val)
+    if (res && !res.ok) {
+      updateSettings({ autoLaunch: !val })
+      showAlert(errorText(t, res.error))
+    }
   }
 
   const toggleTray = async (val) => {
@@ -587,8 +598,8 @@ export default function SettingsView({ onOpenProject }) {
                 </button>
               </Row>
             ) : (
-              <Row title={t('settings.autoLaunch')} desc={t('settings.autoLaunchDesc')}>
-                <Toggle checked={!!settings.autoLaunch} onChange={toggleAutoLaunch} label={t('settings.autoLaunch')} />
+              <Row title={t(autoLaunchKey)} desc={t('settings.autoLaunchDesc')}>
+                <Toggle checked={!!settings.autoLaunch} onChange={toggleAutoLaunch} label={t(autoLaunchKey)} />
               </Row>
             )}
 
